@@ -2,118 +2,209 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
     <title>Dashboard Mercado Laboral Colombia & Pasto | DANE GEIH</title>
-    <!-- Reemplázala por esto en el <head>: -->
-<link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
-<script src="https://cdn.tailwindcss.com"></script>
-
-<style>
-    /* Estilos de respaldo en caso de que falle la red móvil */
-    body {
-        background-color: #0f172a !important; /* slate-900 */
-        color: #f8fafc !important; /* slate-100 */
-    }
-    .bg-slate-800\/60 {
-        background-color: rgba(30, 41, 59, 0.8) !important;
-        border: 1px solid rgba(51, 65, 85, 0.6);
-    }
-</style>
+    <!-- Tailwind CSS v3 Play CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              brandDark: '#0f172a',
+              cardDark: '#1e293b',
+              borderDark: '#334155'
+            }
+          }
+        }
+      }
+    </script>
     <!-- Chart.js CDN -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-        body { font-family: 'Inter', sans-serif; }
+        
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background-color: #0f172a;
+            color: #f8fafc;
+            line-height: 1.5;
+            -webkit-text-size-adjust: 100%;
+        }
+
+        .app-header {
+            position: relative;
+            width: 100%;
+            background-color: #020617;
+            border-bottom: 1px solid #1e293b;
+            padding: 1rem 1.25rem;
+            z-index: 10;
+        }
+
+        @media (min-width: 768px) {
+            .app-header { position: sticky; top: 0; }
+        }
+
+        .card-panel {
+            background-color: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 0.75rem;
+            padding: 1.25rem;
+            margin-bottom: 1rem;
+        }
+
+        .badge-tag {
+            display: inline-block;
+            padding: 0.25rem 0.625rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            white-space: normal;
+            word-break: break-word;
+            line-height: 1.25;
+        }
+
+        .badge-cluster-0 { background-color: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4); }
+        .badge-cluster-1 { background-color: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.4); }
+        .badge-cluster-2 { background-color: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.4); }
+
+        select.form-control {
+            width: 100%;
+            background-color: #0f172a;
+            color: #ffffff;
+            border: 1px solid #475569;
+            border-radius: 0.5rem;
+            padding: 0.625rem 0.875rem;
+            font-size: 0.875rem;
+            outline: none;
+            appearance: none;
+            -webkit-appearance: none;
+            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%2394a3b8' viewBox='0 0 16 16'><path d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/></svg>");
+            background-repeat: no-repeat;
+            background-position: right 0.75rem center;
+            background-size: 1rem;
+        }
+
+        .chart-wrapper {
+            position: relative;
+            width: 100%;
+            min-height: 240px;
+            max-height: 340px;
+        }
+
+        .table-container {
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        table.data-table {
+            width: 100%;
+            min-width: 650px;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 0.8125rem;
+        }
+
+        table.data-table th, table.data-table td {
+            padding: 0.625rem 0.75rem;
+            border-bottom: 1px solid #1e293b;
+        }
+
+        table.data-table th {
+            background-color: #020617;
+            color: #94a3b8;
+            text-transform: uppercase;
+            font-size: 0.6875rem;
+            letter-spacing: 0.05em;
+        }
     </style>
 </head>
-<body class="bg-slate-900 text-slate-100 min-h-screen">
+<body class="bg-slate-900 text-slate-100 min-h-screen pb-12">
 
     <!-- Header / Navbar -->
-    <header class="border-b border-slate-800 bg-slate-950/80 backdrop-blur sticky top-0 z-50 px-6 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
-        <div class="flex items-center gap-3">
-            <div class="p-2 bg-indigo-600/20 text-indigo-400 rounded-lg border border-indigo-500/30">
-                <i data-lucide="bar-chart-3" class="w-6 h-6"></i>
+    <header class="app-header shadow-md">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
+            <div class="flex items-center gap-3">
+                <div class="p-2 bg-indigo-600/20 text-indigo-400 rounded-lg border border-indigo-500/30 shrink-0">
+                    <i data-lucide="bar-chart-3" class="w-6 h-6"></i>
+                </div>
+                <div>
+                    <h1 class="text-lg md:text-xl font-bold text-white tracking-tight">Observatorio del Mercado Laboral</h1>
+                    <p class="text-xs text-slate-400">Análisis Clustered GEIH (DANE) • Enfoque Nariño / Pasto</p>
+                </div>
             </div>
-            <div>
-                <h1 class="text-xl font-bold text-white tracking-tight">Observatorio del Mercado Laboral Colombiano</h1>
-                <p class="text-xs text-slate-400">Análisis Clustered GEIH (DANE) • Enfoque Nariño / Pasto</p>
+            <div class="flex flex-wrap items-center gap-2 mt-1 md:mt-0">
+                <span class="badge-tag badge-cluster-2">
+                    Foco Regional: Pasto
+                </span>
+                <span class="badge-tag bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                    Vercel App
+                </span>
             </div>
-        </div>
-        <div class="flex items-center gap-3">
-            <span class="text-xs px-3 py-1 bg-amber-500/10 text-amber-400 border border-amber-500/20 rounded-full font-medium">
-                Foco Regional: Pasto (Cluster 2)
-            </span>
-            <span class="text-xs px-3 py-1 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-full font-medium">
-                Desplegado en Vercel
-            </span>
         </div>
     </header>
 
-    <!-- Main Content Grid -->
-    <main class="max-w-7xl mx-auto px-4 py-8 space-y-8">
+    <!-- Main Content Container -->
+    <main class="max-w-7xl mx-auto px-3 sm:px-6 py-6 space-y-6">
 
-        <!-- Top Metrics Banner -->
-        <section class="grid grid-cols-1 md:grid-cols-4 gap-4" id="kpi-banner">
+        <!-- Top Metrics Banner (4 KPIs) -->
+        <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4" id="kpi-banner">
             <!-- Dynamic KPI Cards -->
         </section>
 
-        <!-- Selector & Main View -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Main Workspace -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
             
-            <!-- Left Column: City Filter & Diagnosis -->
-            <div class="space-y-6">
-                <!-- City Selector Card -->
-                <div class="bg-slate-800/60 border border-slate-700/60 rounded-xl p-5 shadow-lg">
-                    <label for="city-select" class="block text-sm font-semibold text-slate-300 mb-2 flex items-center gap-2">
-                        <i data-lucide="map-pin" class="w-4 h-4 text-indigo-400"></i> Seleccionar Ciudad para Diagnóstico:
+            <!-- Left Column -->
+            <div class="lg:col-span-5 space-y-4">
+                
+                <div class="card-panel">
+                    <label for="city-select" class="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-2 flex items-center gap-1.5">
+                        <i data-lucide="map-pin" class="w-4 h-4 text-indigo-400"></i> Seleccionar Ciudad:
                     </label>
-                    <select id="city-select" class="w-full bg-slate-900 border border-slate-700 text-white rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                    <select id="city-select" class="form-control">
                         <!-- Options generated dynamically -->
                     </select>
                 </div>
 
-                <!-- Diagnosis Card -->
-                <div class="bg-slate-800/60 border border-slate-700/60 rounded-xl p-6 shadow-lg space-y-4" id="diagnosis-card">
+                <div class="card-panel space-y-3" id="diagnosis-card">
                     <!-- Dynamic Content -->
                 </div>
 
-                <!-- Policy Recommendations Card -->
-                <div class="bg-slate-800/60 border border-slate-700/60 rounded-xl p-6 shadow-lg space-y-3" id="policy-card">
+                <div class="card-panel space-y-2" id="policy-card">
                     <!-- Dynamic Content -->
                 </div>
+
             </div>
 
-            <!-- Right Column: Charts -->
-            <div class="lg:col-span-2 space-y-6">
+            <!-- Right Column -->
+            <div class="lg:col-span-7 space-y-6">
                 
-                <!-- PCA Cluster Scatter Plot -->
-                <div class="bg-slate-800/60 border border-slate-700/60 rounded-xl p-6 shadow-lg">
-                    <div class="flex justify-between items-center mb-4">
-                        <div>
-                            <h3 class="text-base font-bold text-white flex items-center gap-2">
-                                <i data-lucide="scatter-chart" class="w-5 h-5 text-indigo-400"></i> Mapa PCA de Clusters (23 Ciudades)
-                            </h3>
-                            <p class="text-xs text-slate-400">PC1: Formalidad/Calidad vs. PC2: Ocupación/Dinamismo</p>
-                        </div>
+                <div class="card-panel">
+                    <div class="mb-3">
+                        <h3 class="text-sm md:text-base font-bold text-white flex items-center gap-2">
+                            <i data-lucide="scatter-chart" class="w-4 h-4 text-indigo-400"></i> Mapa PCA de Clusters (23 Ciudades)
+                        </h3>
+                        <p class="text-xs text-slate-400">PC1: Formalidad vs. PC2: Ocupación</p>
                     </div>
-                    <div class="h-80 relative">
+                    <div class="chart-wrapper">
                         <canvas id="pcaChart"></canvas>
                     </div>
                 </div>
 
-                <!-- Comparison Bar Chart -->
-                <div class="bg-slate-800/60 border border-slate-700/60 rounded-xl p-6 shadow-lg">
-                    <div class="flex justify-between items-center mb-4">
-                        <div>
-                            <h3 class="text-base font-bold text-white flex items-center gap-2">
-                                <i data-lucide="bar-chart-2" class="w-5 h-5 text-indigo-400"></i> Asalariado Formal vs. Precarización
-                            </h3>
-                            <p class="text-xs text-slate-400">Comparativo respecto al promedio nacional y promedio de su Cluster</p>
-                        </div>
+                <div class="card-panel">
+                    <div class="mb-3">
+                        <h3 class="text-sm md:text-base font-bold text-white flex items-center gap-2">
+                            <i data-lucide="bar-chart-2" class="w-4 h-4 text-indigo-400"></i> Asalariado Formal vs. Precarización
+                        </h3>
+                        <p class="text-xs text-slate-400">Comparativo contra el promedio de su Cluster y las 23 ciudades</p>
                     </div>
-                    <div class="h-64 relative">
+                    <div class="chart-wrapper" style="min-height: 220px;">
                         <canvas id="compChart"></canvas>
                     </div>
                 </div>
@@ -122,23 +213,23 @@
         </div>
 
         <!-- Data Table Section -->
-        <section class="bg-slate-800/60 border border-slate-700/60 rounded-xl p-6 shadow-lg">
-            <h3 class="text-base font-bold text-white mb-4 flex items-center gap-2">
-                <i data-lucide="table" class="w-5 h-5 text-indigo-400"></i> Matriz Completa de Indicadores por Ciudad
+        <section class="card-panel">
+            <h3 class="text-sm md:text-base font-bold text-white mb-3 flex items-center gap-2">
+                <i data-lucide="table" class="w-4 h-4 text-indigo-400"></i> Matriz Completa de Indicadores GEIH por Ciudad
             </h3>
-            <div class="overflow-x-auto">
-                <table class="w-full text-sm text-left text-slate-300">
-                    <thead class="text-xs uppercase bg-slate-900/80 text-slate-400 border-b border-slate-700">
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
                         <tr>
-                            <th class="px-4 py-3">Ciudad</th>
-                            <th class="px-4 py-3">Cluster</th>
-                            <th class="px-4 py-3">TGP (%)</th>
-                            <th class="px-4 py-3">TO (%)</th>
-                            <th class="px-4 py-3">TD (%)</th>
-                            <th class="px-4 py-3">Asalariado Formal (%)</th>
-                            <th class="px-4 py-3">Cuenta Propia (%)</th>
-                            <th class="px-4 py-3">Precarización (%)</th>
-                            <th class="px-4 py-3">Comercio/Aloj. (%)</th>
+                            <th>Ciudad</th>
+                            <th>Cluster</th>
+                            <th>TGP (%)</th>
+                            <th>TO (%)</th>
+                            <th>TD (%)</th>
+                            <th>Asalariado (%)</th>
+                            <th>Cuenta Propia (%)</th>
+                            <th>Precarización (%)</th>
+                            <th>Comercio (%)</th>
                         </tr>
                     </thead>
                     <tbody id="data-table-body">
@@ -150,31 +241,27 @@
 
     </main>
 
-    <!-- Embedded Dataset & JS Logic -->
     <script>
         const cityData = [{"ciudad": "Bogot\u00e1 D.C.", "tgp": 69.83, "to": 64.21, "td": 8.05, "pct_empleado_particular": 59.09, "pct_cuenta_propia": 30.51, "pct_precarizacion": 33.68, "pct_comercio_alojamiento": 23.48, "cluster": 0, "pc1": -3.19, "pc2": -0.74}, {"ciudad": "Medell\u00edn A.M.", "tgp": 67.35, "to": 62.66, "td": 6.97, "pct_empleado_particular": 60.2, "pct_cuenta_propia": 30.12, "pct_precarizacion": 33.16, "pct_comercio_alojamiento": 26.43, "cluster": 0, "pc1": -3.0, "pc2": -0.61}, {"ciudad": "Cali A.M.", "tgp": 64.26, "to": 58.55, "td": 8.89, "pct_empleado_particular": 55.19, "pct_cuenta_propia": 35.35, "pct_precarizacion": 39.41, "pct_comercio_alojamiento": 30.09, "cluster": 2, "pc1": -1.25, "pc2": -0.34}, {"ciudad": "Barranquilla A.M.", "tgp": 61.31, "to": 56.04, "td": 8.6, "pct_empleado_particular": 51.64, "pct_cuenta_propia": 37.12, "pct_precarizacion": 43.05, "pct_comercio_alojamiento": 28.63, "cluster": 2, "pc1": -0.53, "pc2": 0.29}, {"ciudad": "Bucaramanga A.M.", "tgp": 65.24, "to": 60.51, "td": 7.24, "pct_empleado_particular": 51.51, "pct_cuenta_propia": 37.77, "pct_precarizacion": 42.24, "pct_comercio_alojamiento": 28.2, "cluster": 2, "pc1": -1.23, "pc2": -0.92}, {"ciudad": "Manizales A.M.", "tgp": 61.01, "to": 55.93, "td": 8.33, "pct_empleado_particular": 60.12, "pct_cuenta_propia": 27.95, "pct_precarizacion": 31.62, "pct_comercio_alojamiento": 25.27, "cluster": 0, "pc1": -2.31, "pc2": 1.52}, {"ciudad": "Pasto", "tgp": 69.45, "to": 62.68, "td": 9.74, "pct_empleado_particular": 42.55, "pct_cuenta_propia": 41.97, "pct_precarizacion": 46.76, "pct_comercio_alojamiento": 30.58, "cluster": 2, "pc1": -0.27, "pc2": -2.25}, {"ciudad": "Pereira A.M.", "tgp": 59.75, "to": 55.27, "td": 7.48, "pct_empleado_particular": 58.24, "pct_cuenta_propia": 30.37, "pct_precarizacion": 35.02, "pct_comercio_alojamiento": 28.01, "cluster": 0, "pc1": -1.71, "pc2": 1.15}, {"ciudad": "C\u00facuta A.M.", "tgp": 61.91, "to": 55.94, "td": 9.64, "pct_empleado_particular": 32.01, "pct_cuenta_propia": 59.09, "pct_precarizacion": 62.81, "pct_comercio_alojamiento": 33.36, "cluster": 1, "pc1": 3.16, "pc2": -1.93}, {"ciudad": "Ibagu\u00e9", "tgp": 56.63, "to": 49.41, "td": 12.75, "pct_empleado_particular": 59.56, "pct_cuenta_propia": 30.14, "pct_precarizacion": 33.61, "pct_comercio_alojamiento": 29.73, "cluster": 0, "pc1": -0.66, "pc2": 2.76}, {"ciudad": "Monter\u00eda", "tgp": 63.79, "to": 56.63, "td": 11.22, "pct_empleado_particular": 46.15, "pct_cuenta_propia": 38.61, "pct_precarizacion": 45.79, "pct_comercio_alojamiento": 30.1, "cluster": 2, "pc1": 0.15, "pc2": -0.27}, {"ciudad": "Cartagena", "tgp": 63.32, "to": 54.72, "td": 13.59, "pct_empleado_particular": 36.47, "pct_cuenta_propia": 52.85, "pct_precarizacion": 58.51, "pct_comercio_alojamiento": 29.06, "cluster": 1, "pc1": 2.52, "pc2": -0.63}, {"ciudad": "Villavicencio", "tgp": 69.04, "to": 63.48, "td": 8.06, "pct_empleado_particular": 48.47, "pct_cuenta_propia": 37.35, "pct_precarizacion": 42.66, "pct_comercio_alojamiento": 34.15, "cluster": 2, "pc1": -1.09, "pc2": -2.5}, {"ciudad": "Tunja", "tgp": 60.9, "to": 53.33, "td": 12.43, "pct_empleado_particular": 53.18, "pct_cuenta_propia": 29.39, "pct_precarizacion": 32.05, "pct_comercio_alojamiento": 23.84, "cluster": 0, "pc1": -1.31, "pc2": 2.25}, {"ciudad": "Florencia", "tgp": 59.31, "to": 54.53, "td": 8.06, "pct_empleado_particular": 38.17, "pct_cuenta_propia": 46.89, "pct_precarizacion": 50.94, "pct_comercio_alojamiento": 29.06, "cluster": 1, "pc1": 1.35, "pc2": -0.18}, {"ciudad": "Popay\u00e1n", "tgp": 62.73, "to": 57.59, "td": 8.2, "pct_empleado_particular": 40.11, "pct_cuenta_propia": 43.63, "pct_precarizacion": 48.65, "pct_comercio_alojamiento": 28.61, "cluster": 2, "pc1": 0.52, "pc2": -0.77}, {"ciudad": "Valledupar", "tgp": 58.99, "to": 53.24, "td": 9.75, "pct_empleado_particular": 50.79, "pct_cuenta_propia": 36.05, "pct_precarizacion": 42.68, "pct_comercio_alojamiento": 30.32, "cluster": 2, "pc1": -0.04, "pc2": 0.91}, {"ciudad": "Quibd\u00f3", "tgp": 56.74, "to": 43.71, "td": 22.96, "pct_empleado_particular": 35.31, "pct_cuenta_propia": 46.48, "pct_precarizacion": 52.12, "pct_comercio_alojamiento": 25.66, "cluster": 1, "pc1": 3.77, "pc2": 3.44}, {"ciudad": "Neiva", "tgp": 63.66, "to": 57.44, "td": 9.77, "pct_empleado_particular": 48.78, "pct_cuenta_propia": 41.37, "pct_precarizacion": 43.85, "pct_comercio_alojamiento": 30.24, "cluster": 2, "pc1": -0.12, "pc2": -0.5}, {"ciudad": "Riohacha", "tgp": 63.15, "to": 55.7, "td": 11.8, "pct_empleado_particular": 27.5, "pct_cuenta_propia": 56.13, "pct_precarizacion": 62.52, "pct_comercio_alojamiento": 25.89, "cluster": 1, "pc1": 2.99, "pc2": -0.96}, {"ciudad": "Santa Marta", "tgp": 57.37, "to": 52.28, "td": 8.87, "pct_empleado_particular": 48.96, "pct_cuenta_propia": 40.84, "pct_precarizacion": 45.0, "pct_comercio_alojamiento": 32.25, "cluster": 2, "pc1": 0.63, "pc2": 0.68}, {"ciudad": "Armenia", "tgp": 60.97, "to": 55.78, "td": 8.51, "pct_empleado_particular": 48.42, "pct_cuenta_propia": 38.62, "pct_precarizacion": 43.32, "pct_comercio_alojamiento": 29.67, "cluster": 2, "pc1": -0.18, "pc2": 0.11}, {"ciudad": "Sincelejo", "tgp": 63.49, "to": 55.25, "td": 12.97, "pct_empleado_particular": 37.61, "pct_cuenta_propia": 47.61, "pct_precarizacion": 54.17, "pct_comercio_alojamiento": 29.23, "cluster": 1, "pc1": 1.82, "pc2": -0.49}];
 
         const clusterDescriptions = {
             0: {
                 name: "Cluster 0: Formales / Consolidados",
-                color: "#10b981",
-                badge: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
-                desc: "Ciudades con alta proporción de empleos asalariados formales (~58.4%) y menores niveles de precarización relativa.",
-                policy: "Incentivos a la innovación de alta tecnología, atracción de inversión extranjera directa y fortalecimiento del empleo calificado."
+                badgeClass: "badge-cluster-0",
+                desc: "Ciudades con alta proporción de empleo asalariado formal (~58.4%) y menor precarización relativa.",
+                policy: "Incentivos a la innovación tecnológica, atracción de inversión privada y fortalecimiento del empleo calificado."
             },
             1: {
-                name: "Cluster 1: Precarización Extrema / Informalidad Crítica",
-                color: "#ef4444",
-                badge: "bg-rose-500/10 text-rose-400 border-rose-500/20",
-                desc: "Mercados laborales con desempleo elevado (~13.2%) e informalidad/cuenta propia dominante (>56%). Vulnerabilidad social alta.",
-                policy: "Programas de choque contra el desempleo juvenil, subsidios condicionados y formalización masiva de microempresas de supervivencia."
+                name: "Cluster 1: Precarización Extrema",
+                badgeClass: "badge-cluster-1",
+                desc: "Mercados laborales con desempleo elevado (~13.2%) e informalidad/cuenta propia dominante (>56%). Vulnerabilidad alta.",
+                policy: "Programas de choque para el empleo juvenil, subsidios condicionados y formalización masiva de microempresas de supervivencia."
             },
             2: {
-                name: "Cluster 2: Vulnerables / Informalidad Urbana (Foco Pasto)",
-                color: "#f59e0b",
-                badge: "bg-amber-500/10 text-amber-400 border-amber-500/20",
-                desc: "Paradoja de Ocupación: Altas tasas de participación laboral por necesidad de subsistencia, pero con precarización cercana al 47%.",
-                policy: "Microcréditos de fomento productivo, reconversión laboral a competencias digitales y encadenamiento comercial agroindustrial para Nariño."
+                name: "Cluster 2: Informalidad Urbana (Foco Pasto)",
+                badgeClass: "badge-cluster-2",
+                desc: "Paradoja de Ocupación: Altas tasas de participación por necesidad de subsistencia, pero con precarización cercana al 47%.",
+                policy: "Microcréditos de fomento productivo, reconversión a habilidades digitales y encadenamiento comercial agroindustrial para Nariño."
             }
         };
 
@@ -182,19 +269,19 @@
         let compChartInstance = null;
 
         document.addEventListener('DOMContentLoaded', () => {
-            lucide.createIcons();
+            if (window.lucide) lucide.createIcons();
             populateSelect();
             renderTable();
             initCharts();
-            updateDashboard("Pasto"); // Default focus on Pasto
+            updateDashboard("Pasto");
         });
 
         function populateSelect() {
             const select = document.getElementById('city-select');
-            cityData.sort((a, b) => a.ciudad.localeCompare(b.ciudad)).forEach(c => {
+            cityData.slice().sort((a, b) => a.ciudad.localeCompare(b.ciudad)).forEach(c => {
                 const opt = document.createElement('option');
                 opt.value = c.ciudad;
-                opt.textContent = c.ciudad + (c.ciudad === "Pasto" ? " (Foco Principal)" : "");
+                opt.textContent = c.ciudad + (c.ciudad === "Pasto" ? " ⭐ (Foco Principal)" : "");
                 if (c.ciudad === "Pasto") opt.selected = true;
                 select.appendChild(opt);
             });
@@ -204,64 +291,63 @@
 
         function updateDashboard(cityName) {
             const city = cityData.find(c => c.ciudad === cityName);
+            if (!city) return;
             const cluster = clusterDescriptions[city.cluster];
 
-            // Update KPI Banner
             document.getElementById('kpi-banner').innerHTML = `
-                <div class="bg-slate-800/60 border border-slate-700/60 p-5 rounded-xl shadow">
-                    <p class="text-xs text-slate-400">Tasa de Ocupación (TO)</p>
-                    <p class="text-2xl font-bold text-white mt-1">${city.to}%</p>
+                <div class="bg-slate-800/90 border border-slate-700/80 p-3.5 rounded-xl">
+                    <p class="text-xs text-slate-400 font-medium">Tasa de Ocupación (TO)</p>
+                    <p class="text-2xl font-bold text-white mt-0.5">${city.to}%</p>
                     <span class="text-xs text-slate-400">Participación: ${city.tgp}%</span>
                 </div>
-                <div class="bg-slate-800/60 border border-slate-700/60 p-5 rounded-xl shadow">
-                    <p class="text-xs text-slate-400">Tasa de Desocupación (TD)</p>
-                    <p class="text-2xl font-bold ${city.td > 10 ? 'text-rose-400' : 'text-emerald-400'} mt-1">${city.td}%</p>
+                <div class="bg-slate-800/90 border border-slate-700/80 p-3.5 rounded-xl">
+                    <p class="text-xs text-slate-400 font-medium">Tasa de Desocupación (TD)</p>
+                    <p class="text-2xl font-bold ${city.td > 10 ? 'text-rose-400' : 'text-emerald-400'} mt-0.5">${city.td}%</p>
                     <span class="text-xs text-slate-400">Desempleo abierto</span>
                 </div>
-                <div class="bg-slate-800/60 border border-slate-700/60 p-5 rounded-xl shadow">
-                    <p class="text-xs text-slate-400">Índice de Precarización</p>
-                    <p class="text-2xl font-bold text-amber-400 mt-1">${city.pct_precarizacion}%</p>
+                <div class="bg-slate-800/90 border border-slate-700/80 p-3.5 rounded-xl">
+                    <p class="text-xs text-slate-400 font-medium">Índice de Precarización</p>
+                    <p class="text-2xl font-bold text-amber-400 mt-0.5">${city.pct_precarizacion}%</p>
                     <span class="text-xs text-slate-400">Cuenta propia + jornaleros</span>
                 </div>
-                <div class="bg-slate-800/60 border border-slate-700/60 p-5 rounded-xl shadow">
-                    <p class="text-xs text-slate-400">Asalariado Formal Empresa</p>
-                    <p class="text-2xl font-bold text-indigo-400 mt-1">${city.pct_empleado_particular}%</p>
+                <div class="bg-slate-800/90 border border-slate-700/80 p-3.5 rounded-xl">
+                    <p class="text-xs text-slate-400 font-medium">Asalariado Formal Empresa</p>
+                    <p class="text-2xl font-bold text-indigo-400 mt-0.5">${city.pct_empleado_particular}%</p>
                     <span class="text-xs text-slate-400">Sector privado formal</span>
                 </div>
             `;
 
-            // Update Diagnosis Card
             document.getElementById('diagnosis-card').innerHTML = `
-                <div class="flex items-center justify-between">
-                    <h4 class="text-sm font-bold text-white">${city.ciudad}</h4>
-                    <span class="text-xs px-2.5 py-1 rounded-full border ${cluster.badge}">${cluster.name}</span>
+                <div class="flex flex-wrap items-center justify-between gap-2">
+                    <h4 class="text-base font-bold text-white">${city.ciudad}</h4>
+                    <span class="badge-tag ${cluster.badgeClass}">${cluster.name}</span>
                 </div>
                 <p class="text-xs text-slate-300 leading-relaxed">${cluster.desc}</p>
-                <div class="text-xs bg-slate-900/60 p-3 rounded-lg border border-slate-700/50 space-y-1">
+                <div class="text-xs bg-slate-900/80 p-3 rounded-lg border border-slate-700/60 space-y-1">
                     <p><strong class="text-indigo-400">Concentración Comercio/Servicios:</strong> ${city.pct_comercio_alojamiento}%</p>
-                    <p><strong class="text-amber-400">Cuenta Propia:</strong> ${city.pct_cuenta_propia}%</p>
+                    <p><strong class="text-amber-400">Cuenta Propia / Subsistencia:</strong> ${city.pct_cuenta_propia}%</p>
                 </div>
             `;
 
-            // Update Policy Card
             document.getElementById('policy-card').innerHTML = `
-                <h4 class="text-xs font-bold text-indigo-400 uppercase tracking-wider flex items-center gap-1.5">
-                    <i data-lucide="lightbulb" class="w-4 h-4"></i> Recomendación de Política Pública
+                <h4 class="text-xs font-bold text-indigo-400 uppercase tracking-wider flex items-center gap-1">
+                    <i data-lucide="lightbulb" class="w-3.5 h-3.5"></i> Recomendación de Política Pública
                 </h4>
                 <p class="text-xs text-slate-300 leading-relaxed">${cluster.policy}</p>
             `;
-            lucide.createIcons();
+            if (window.lucide) lucide.createIcons();
 
             updateCompChart(city);
         }
 
         function initCharts() {
-            // PCA Scatter Chart
             const ctxPca = document.getElementById('pcaChart').getContext('2d');
+            const clusterColors = { 0: '#10b981', 1: '#ef4444', 2: '#f59e0b' };
+
             const datasets = [0, 1, 2].map(cId => ({
                 label: clusterDescriptions[cId].name,
                 data: cityData.filter(c => c.cluster === cId).map(c => ({ x: c.pc1, y: c.pc2, city: c.ciudad })),
-                backgroundColor: clusterDescriptions[cId].color,
+                backgroundColor: clusterColors[cId],
                 pointRadius: 6,
                 pointHoverRadius: 9
             }));
@@ -278,11 +364,15 @@
                                 label: (ctx) => `${ctx.raw.city} (PC1: ${ctx.raw.x}, PC2: ${ctx.raw.y})`
                             }
                         },
-                        legend: { labels: { color: '#94a3b8', font: { size: 11 } } }
+                        legend: {
+                            display: true,
+                            position: 'bottom',
+                            labels: { color: '#94a3b8', font: { size: 10 }, boxWidth: 10, padding: 8 }
+                        }
                     },
                     scales: {
-                        x: { title: { display: true, text: 'PC1: Formalidad / Calidad', color: '#94a3b8' }, grid: { color: '#334155' } },
-                        y: { title: { display: true, text: 'PC2: Dinamismo / Ocupación', color: '#94a3b8' }, grid: { color: '#334155' } }
+                        x: { title: { display: true, text: 'PC1: Formalidad / Calidad', color: '#94a3b8', font: { size: 10 } }, grid: { color: '#334155' }, ticks: { color: '#94a3b8', font: { size: 9 } } },
+                        y: { title: { display: true, text: 'PC2: Dinamismo / Ocupación', color: '#94a3b8', font: { size: 10 } }, grid: { color: '#334155' }, ticks: { color: '#94a3b8', font: { size: 9 } } }
                     }
                 }
             });
@@ -291,20 +381,19 @@
         function updateCompChart(city) {
             const ctxComp = document.getElementById('compChart').getContext('2d');
             
-            // Calculate cluster avg
             const clusterCities = cityData.filter(c => c.cluster === city.cluster);
-            const avgClusterFormal = (clusterCities.reduce((acc, c) => acc + c.pct_empleado_particular, 0) / clusterCities.length).toFixed(2);
-            const avgClusterPrecar = (clusterCities.reduce((acc, c) => acc + c.pct_precarizacion, 0) / clusterCities.length).toFixed(2);
+            const avgClusterFormal = (clusterCities.reduce((acc, c) => acc + c.pct_empleado_particular, 0) / clusterCities.length).toFixed(1);
+            const avgClusterPrecar = (clusterCities.reduce((acc, c) => acc + c.pct_precarizacion, 0) / clusterCities.length).toFixed(1);
 
-            const avgNatFormal = (cityData.reduce((acc, c) => acc + c.pct_empleado_particular, 0) / cityData.length).toFixed(2);
-            const avgNatPrecar = (cityData.reduce((acc, c) => acc + c.pct_precarizacion, 0) / cityData.length).toFixed(2);
+            const avgNatFormal = (cityData.reduce((acc, c) => acc + c.pct_empleado_particular, 0) / cityData.length).toFixed(1);
+            const avgNatPrecar = (cityData.reduce((acc, c) => acc + c.pct_precarizacion, 0) / cityData.length).toFixed(1);
 
             if (compChartInstance) compChartInstance.destroy();
 
             compChartInstance = new Chart(ctxComp, {
                 type: 'bar',
                 data: {
-                    labels: [city.ciudad, `Promedio Cluster ${city.cluster}`, 'Promedio 23 Ciudades'],
+                    labels: [city.ciudad, `Cluster ${city.cluster}`, '23 Ciudades'],
                     datasets: [
                         {
                             label: 'Asalariado Formal (%)',
@@ -322,11 +411,15 @@
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: {
-                        legend: { labels: { color: '#94a3b8', font: { size: 11 } } }
+                        legend: {
+                            display: true,
+                            position: 'bottom',
+                            labels: { color: '#94a3b8', font: { size: 10 }, boxWidth: 10, padding: 8 }
+                        }
                     },
                     scales: {
-                        x: { grid: { display: false }, ticks: { color: '#94a3b8' } },
-                        y: { grid: { color: '#334155' }, ticks: { color: '#94a3b8' } }
+                        x: { grid: { display: false }, ticks: { color: '#94a3b8', font: { size: 10 } } },
+                        y: { grid: { color: '#334155' }, ticks: { color: '#94a3b8', font: { size: 9 } } }
                     }
                 }
             });
@@ -335,16 +428,16 @@
         function renderTable() {
             const tbody = document.getElementById('data-table-body');
             tbody.innerHTML = cityData.map(c => `
-                <tr class="border-b border-slate-800 hover:bg-slate-800/40">
-                    <td class="px-4 py-2.5 font-semibold text-white">${c.ciudad}</td>
-                    <td class="px-4 py-2.5"><span class="text-xs px-2 py-0.5 rounded border ${clusterDescriptions[c.cluster].badge}">Cluster ${c.cluster}</span></td>
-                    <td class="px-4 py-2.5">${c.tgp}%</td>
-                    <td class="px-4 py-2.5">${c.to}%</td>
-                    <td class="px-4 py-2.5">${c.td}%</td>
-                    <td class="px-4 py-2.5 text-indigo-400 font-medium">${c.pct_empleado_particular}%</td>
-                    <td class="px-4 py-2.5">${c.pct_cuenta_propia}%</td>
-                    <td class="px-4 py-2.5 text-amber-400 font-medium">${c.pct_precarizacion}%</td>
-                    <td class="px-4 py-2.5">${c.pct_comercio_alojamiento}%</td>
+                <tr>
+                    <td style="font-weight: 600; color: #ffffff;">${c.ciudad}</td>
+                    <td><span class="badge-tag ${clusterDescriptions[c.cluster].badgeClass}">Cluster ${c.cluster}</span></td>
+                    <td>${c.tgp}%</td>
+                    <td>${c.to}%</td>
+                    <td>${c.td}%</td>
+                    <td style="color: #818cf8; font-weight: 500;">${c.pct_empleado_particular}%</td>
+                    <td>${c.pct_cuenta_propia}%</td>
+                    <td style="color: #fbbf24; font-weight: 500;">${c.pct_precarizacion}%</td>
+                    <td>${c.pct_comercio_alojamiento}%</td>
                 </tr>
             `).join('');
         }
