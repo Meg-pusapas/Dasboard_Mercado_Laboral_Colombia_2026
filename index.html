@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-    <title>Dashboard Mercado Laboral Colombia & Pasto | DANE GEIH</title>
+    <title>Observatorio del Mercado Laboral & Salud Mental | DANE GEIH & Medicina Legal</title>
     <!-- Tailwind CSS v3 Play CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -131,19 +131,19 @@
         <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
             <div class="flex items-center gap-3">
                 <div class="p-2 bg-indigo-600/20 text-indigo-400 rounded-lg border border-indigo-500/30 shrink-0">
-                    <i data-lucide="bar-chart-3" class="w-6 h-6"></i>
+                    <i data-lucide="heart-pulse" class="w-6 h-6"></i>
                 </div>
                 <div>
-                    <h1 class="text-lg md:text-xl font-bold text-white tracking-tight">Observatorio del Mercado Laboral</h1>
-                    <p class="text-xs text-slate-400">Análisis Clustered GEIH (DANE) • Enfoque Nariño / Pasto</p>
+                    <h1 class="text-lg md:text-xl font-bold text-white tracking-tight">Observatorio de Mercado Laboral & Salud Mental</h1>
+                    <p class="text-xs text-slate-400">Análisis Multidisciplinar GEIH (DANE) + Medicina Legal (2025-2026) • Foco Nariño / Pasto</p>
                 </div>
             </div>
             <div class="flex flex-wrap items-center gap-2 mt-1 md:mt-0">
                 <span class="badge-tag badge-cluster-2">
                     Foco Regional: Pasto
                 </span>
-                <span class="badge-tag bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                    Vercel App
+                <span class="badge-tag bg-rose-500/10 text-rose-400 border border-rose-500/20">
+                    Enfoque Psicosocial
                 </span>
             </div>
         </div>
@@ -157,12 +157,35 @@
             <!-- Dynamic KPI Cards -->
         </section>
 
+        <!-- Social & Mental Health Special Banner -->
+        <section class="card-panel border-rose-500/30 bg-gradient-to-r from-slate-900 via-slate-800 to-rose-950/30">
+            <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                <div class="space-y-1.5">
+                    <div class="flex items-center gap-2">
+                        <span class="p-1.5 bg-rose-500/20 text-rose-400 rounded border border-rose-500/30">
+                            <i data-lucide="brain-circuit" class="w-4 h-4"></i>
+                        </span>
+                        <h3 class="text-sm md:text-base font-bold text-rose-300">Dimensión Social: Calidad del Empleo y Salud Mental en Colombia</h3>
+                    </div>
+                    <p class="text-xs text-slate-300 leading-relaxed max-w-4xl">
+                        Datos del Instituto Nacional de Medicina Legal (2025-2026) revelan que el <strong>14.2% de los suicidios con causa registrada en Nariño</strong> obedecieron a razones económicas/laborales (frente al 10.6% nacional), concentrándose el <strong>86.7% en hombres en edad productiva</strong>. La sobrecarga del rol de proveedor y la precarización crónica actúan como determinantes de estrés y riesgo psicosocial.
+                    </p>
+                </div>
+                <div class="shrink-0 bg-rose-900/40 border border-rose-700/50 p-3 rounded-lg text-center min-w-[200px]">
+                    <p class="text-xs text-rose-200 font-semibold">¿Necesitas orientación o apoyo?</p>
+                    <p class="text-xs text-rose-300 mt-1"><strong class="text-white">Línea 106</strong> (Nariño) • <strong class="text-white">106 / 192</strong> (Nacional)</p>
+                    <span class="inline-block mt-1 text-[10px] text-rose-400 font-medium">Atención confidencial 24/7</span>
+                </div>
+            </div>
+        </section>
+
         <!-- Main Workspace -->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
             
             <!-- Left Column -->
             <div class="lg:col-span-5 space-y-4">
                 
+                <!-- City Selector Card -->
                 <div class="card-panel">
                     <label for="city-select" class="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-2 flex items-center gap-1.5">
                         <i data-lucide="map-pin" class="w-4 h-4 text-indigo-400"></i> Seleccionar Ciudad:
@@ -172,10 +195,17 @@
                     </select>
                 </div>
 
+                <!-- Diagnosis Card -->
                 <div class="card-panel space-y-3" id="diagnosis-card">
                     <!-- Dynamic Content -->
                 </div>
 
+                <!-- Mental Health Vulnerability Card -->
+                <div class="card-panel space-y-2 border-amber-500/30" id="mental-health-card">
+                    <!-- Dynamic Content -->
+                </div>
+
+                <!-- Policy Recommendations Card -->
                 <div class="card-panel space-y-2" id="policy-card">
                     <!-- Dynamic Content -->
                 </div>
@@ -185,18 +215,20 @@
             <!-- Right Column -->
             <div class="lg:col-span-7 space-y-6">
                 
+                <!-- PCA Cluster Scatter Plot -->
                 <div class="card-panel">
                     <div class="mb-3">
                         <h3 class="text-sm md:text-base font-bold text-white flex items-center gap-2">
-                            <i data-lucide="scatter-chart" class="w-4 h-4 text-indigo-400"></i> Mapa PCA de Clusters (23 Ciudades)
+                            <i data-lucide="scatter-chart" class="w-4 h-4 text-indigo-400"></i> Mapa PCA de Clusters Laborales (23 Ciudades)
                         </h3>
-                        <p class="text-xs text-slate-400">PC1: Formalidad vs. PC2: Ocupación</p>
+                        <p class="text-xs text-slate-400">PC1: Formalidad/Calidad vs. PC2: Ocupación/Dinamismo (Coincide con Colab)</p>
                     </div>
                     <div class="chart-wrapper">
                         <canvas id="pcaChart"></canvas>
                     </div>
                 </div>
 
+                <!-- Comparison Bar Chart -->
                 <div class="card-panel">
                     <div class="mb-3">
                         <h3 class="text-sm md:text-base font-bold text-white flex items-center gap-2">
@@ -209,13 +241,26 @@
                     </div>
                 </div>
 
+                <!-- Suicide Causes Breakdown Chart (Medicina Legal) -->
+                <div class="card-panel border-rose-500/30">
+                    <div class="mb-3">
+                        <h3 class="text-sm md:text-base font-bold text-rose-300 flex items-center gap-2">
+                            <i data-lucide="pie-chart" class="w-4 h-4 text-rose-400"></i> Cuestión Social: Causas de Lesiones Fatales (Medicina Legal)
+                        </h3>
+                        <p class="text-xs text-slate-400">Proporción de factores desencadenantes en suicidios registrados (2025-2026)</p>
+                    </div>
+                    <div class="chart-wrapper" style="min-height: 220px;">
+                        <canvas id="suicideChart"></canvas>
+                    </div>
+                </div>
+
             </div>
         </div>
 
         <!-- Data Table Section -->
         <section class="card-panel">
             <h3 class="text-sm md:text-base font-bold text-white mb-3 flex items-center gap-2">
-                <i data-lucide="table" class="w-4 h-4 text-indigo-400"></i> Matriz Completa de Indicadores GEIH por Ciudad
+                <i data-lucide="table" class="w-4 h-4 text-indigo-400"></i> Matriz Completa GEIH + Indicador de Riesgo Psicosocial
             </h3>
             <div class="table-container">
                 <table class="data-table">
@@ -227,9 +272,8 @@
                             <th>TO (%)</th>
                             <th>TD (%)</th>
                             <th>Asalariado (%)</th>
-                            <th>Cuenta Propia (%)</th>
                             <th>Precarización (%)</th>
-                            <th>Comercio (%)</th>
+                            <th>Riesgo Psicosocial</th>
                         </tr>
                     </thead>
                     <tbody id="data-table-body">
@@ -242,37 +286,42 @@
     </main>
 
     <script>
-        const cityData = [{"ciudad": "Bogot\u00e1 D.C.", "tgp": 69.83, "to": 64.21, "td": 8.05, "pct_empleado_particular": 59.09, "pct_cuenta_propia": 30.51, "pct_precarizacion": 33.68, "pct_comercio_alojamiento": 23.48, "cluster": 0, "pc1": -3.19, "pc2": -0.74}, {"ciudad": "Medell\u00edn A.M.", "tgp": 67.35, "to": 62.66, "td": 6.97, "pct_empleado_particular": 60.2, "pct_cuenta_propia": 30.12, "pct_precarizacion": 33.16, "pct_comercio_alojamiento": 26.43, "cluster": 0, "pc1": -3.0, "pc2": -0.61}, {"ciudad": "Cali A.M.", "tgp": 64.26, "to": 58.55, "td": 8.89, "pct_empleado_particular": 55.19, "pct_cuenta_propia": 35.35, "pct_precarizacion": 39.41, "pct_comercio_alojamiento": 30.09, "cluster": 2, "pc1": -1.25, "pc2": -0.34}, {"ciudad": "Barranquilla A.M.", "tgp": 61.31, "to": 56.04, "td": 8.6, "pct_empleado_particular": 51.64, "pct_cuenta_propia": 37.12, "pct_precarizacion": 43.05, "pct_comercio_alojamiento": 28.63, "cluster": 2, "pc1": -0.53, "pc2": 0.29}, {"ciudad": "Bucaramanga A.M.", "tgp": 65.24, "to": 60.51, "td": 7.24, "pct_empleado_particular": 51.51, "pct_cuenta_propia": 37.77, "pct_precarizacion": 42.24, "pct_comercio_alojamiento": 28.2, "cluster": 2, "pc1": -1.23, "pc2": -0.92}, {"ciudad": "Manizales A.M.", "tgp": 61.01, "to": 55.93, "td": 8.33, "pct_empleado_particular": 60.12, "pct_cuenta_propia": 27.95, "pct_precarizacion": 31.62, "pct_comercio_alojamiento": 25.27, "cluster": 0, "pc1": -2.31, "pc2": 1.52}, {"ciudad": "Pasto", "tgp": 69.45, "to": 62.68, "td": 9.74, "pct_empleado_particular": 42.55, "pct_cuenta_propia": 41.97, "pct_precarizacion": 46.76, "pct_comercio_alojamiento": 30.58, "cluster": 2, "pc1": -0.27, "pc2": -2.25}, {"ciudad": "Pereira A.M.", "tgp": 59.75, "to": 55.27, "td": 7.48, "pct_empleado_particular": 58.24, "pct_cuenta_propia": 30.37, "pct_precarizacion": 35.02, "pct_comercio_alojamiento": 28.01, "cluster": 0, "pc1": -1.71, "pc2": 1.15}, {"ciudad": "C\u00facuta A.M.", "tgp": 61.91, "to": 55.94, "td": 9.64, "pct_empleado_particular": 32.01, "pct_cuenta_propia": 59.09, "pct_precarizacion": 62.81, "pct_comercio_alojamiento": 33.36, "cluster": 1, "pc1": 3.16, "pc2": -1.93}, {"ciudad": "Ibagu\u00e9", "tgp": 56.63, "to": 49.41, "td": 12.75, "pct_empleado_particular": 59.56, "pct_cuenta_propia": 30.14, "pct_precarizacion": 33.61, "pct_comercio_alojamiento": 29.73, "cluster": 0, "pc1": -0.66, "pc2": 2.76}, {"ciudad": "Monter\u00eda", "tgp": 63.79, "to": 56.63, "td": 11.22, "pct_empleado_particular": 46.15, "pct_cuenta_propia": 38.61, "pct_precarizacion": 45.79, "pct_comercio_alojamiento": 30.1, "cluster": 2, "pc1": 0.15, "pc2": -0.27}, {"ciudad": "Cartagena", "tgp": 63.32, "to": 54.72, "td": 13.59, "pct_empleado_particular": 36.47, "pct_cuenta_propia": 52.85, "pct_precarizacion": 58.51, "pct_comercio_alojamiento": 29.06, "cluster": 1, "pc1": 2.52, "pc2": -0.63}, {"ciudad": "Villavicencio", "tgp": 69.04, "to": 63.48, "td": 8.06, "pct_empleado_particular": 48.47, "pct_cuenta_propia": 37.35, "pct_precarizacion": 42.66, "pct_comercio_alojamiento": 34.15, "cluster": 2, "pc1": -1.09, "pc2": -2.5}, {"ciudad": "Tunja", "tgp": 60.9, "to": 53.33, "td": 12.43, "pct_empleado_particular": 53.18, "pct_cuenta_propia": 29.39, "pct_precarizacion": 32.05, "pct_comercio_alojamiento": 23.84, "cluster": 0, "pc1": -1.31, "pc2": 2.25}, {"ciudad": "Florencia", "tgp": 59.31, "to": 54.53, "td": 8.06, "pct_empleado_particular": 38.17, "pct_cuenta_propia": 46.89, "pct_precarizacion": 50.94, "pct_comercio_alojamiento": 29.06, "cluster": 1, "pc1": 1.35, "pc2": -0.18}, {"ciudad": "Popay\u00e1n", "tgp": 62.73, "to": 57.59, "td": 8.2, "pct_empleado_particular": 40.11, "pct_cuenta_propia": 43.63, "pct_precarizacion": 48.65, "pct_comercio_alojamiento": 28.61, "cluster": 2, "pc1": 0.52, "pc2": -0.77}, {"ciudad": "Valledupar", "tgp": 58.99, "to": 53.24, "td": 9.75, "pct_empleado_particular": 50.79, "pct_cuenta_propia": 36.05, "pct_precarizacion": 42.68, "pct_comercio_alojamiento": 30.32, "cluster": 2, "pc1": -0.04, "pc2": 0.91}, {"ciudad": "Quibd\u00f3", "tgp": 56.74, "to": 43.71, "td": 22.96, "pct_empleado_particular": 35.31, "pct_cuenta_propia": 46.48, "pct_precarizacion": 52.12, "pct_comercio_alojamiento": 25.66, "cluster": 1, "pc1": 3.77, "pc2": 3.44}, {"ciudad": "Neiva", "tgp": 63.66, "to": 57.44, "td": 9.77, "pct_empleado_particular": 48.78, "pct_cuenta_propia": 41.37, "pct_precarizacion": 43.85, "pct_comercio_alojamiento": 30.24, "cluster": 2, "pc1": -0.12, "pc2": -0.5}, {"ciudad": "Riohacha", "tgp": 63.15, "to": 55.7, "td": 11.8, "pct_empleado_particular": 27.5, "pct_cuenta_propia": 56.13, "pct_precarizacion": 62.52, "pct_comercio_alojamiento": 25.89, "cluster": 1, "pc1": 2.99, "pc2": -0.96}, {"ciudad": "Santa Marta", "tgp": 57.37, "to": 52.28, "td": 8.87, "pct_empleado_particular": 48.96, "pct_cuenta_propia": 40.84, "pct_precarizacion": 45.0, "pct_comercio_alojamiento": 32.25, "cluster": 2, "pc1": 0.63, "pc2": 0.68}, {"ciudad": "Armenia", "tgp": 60.97, "to": 55.78, "td": 8.51, "pct_empleado_particular": 48.42, "pct_cuenta_propia": 38.62, "pct_precarizacion": 43.32, "pct_comercio_alojamiento": 29.67, "cluster": 2, "pc1": -0.18, "pc2": 0.11}, {"ciudad": "Sincelejo", "tgp": 63.49, "to": 55.25, "td": 12.97, "pct_empleado_particular": 37.61, "pct_cuenta_propia": 47.61, "pct_precarizacion": 54.17, "pct_comercio_alojamiento": 29.23, "cluster": 1, "pc1": 1.82, "pc2": -0.49}];
+        const cityData = [{"ciudad": "Bogot\u00e1 D.C.", "tgp": 69.83, "to": 64.21, "td": 8.05, "pct_empleado_particular": 59.09, "pct_cuenta_propia": 30.51, "pct_precarizacion": 33.68, "pct_comercio_alojamiento": 23.48, "cluster": 0, "pc1": 3.19, "pc2": 0.74, "riesgo_psicosocial": "Moderado-Bajo"}, {"ciudad": "Medell\u00edn A.M.", "tgp": 67.35, "to": 62.66, "td": 6.97, "pct_empleado_particular": 60.2, "pct_cuenta_propia": 30.12, "pct_precarizacion": 33.16, "pct_comercio_alojamiento": 26.43, "cluster": 0, "pc1": 3.0, "pc2": 0.61, "riesgo_psicosocial": "Moderado-Bajo"}, {"ciudad": "Cali A.M.", "tgp": 64.26, "to": 58.55, "td": 8.89, "pct_empleado_particular": 55.19, "pct_cuenta_propia": 35.35, "pct_precarizacion": 39.41, "pct_comercio_alojamiento": 30.09, "cluster": 2, "pc1": 1.25, "pc2": 0.34, "riesgo_psicosocial": "Moderado-Alto"}, {"ciudad": "Barranquilla A.M.", "tgp": 61.31, "to": 56.04, "td": 8.6, "pct_empleado_particular": 51.64, "pct_cuenta_propia": 37.12, "pct_precarizacion": 43.05, "pct_comercio_alojamiento": 28.63, "cluster": 2, "pc1": 0.53, "pc2": -0.29, "riesgo_psicosocial": "Moderado-Alto"}, {"ciudad": "Bucaramanga A.M.", "tgp": 65.24, "to": 60.51, "td": 7.24, "pct_empleado_particular": 51.51, "pct_cuenta_propia": 37.77, "pct_precarizacion": 42.24, "pct_comercio_alojamiento": 28.2, "cluster": 2, "pc1": 1.23, "pc2": 0.92, "riesgo_psicosocial": "Moderado"}, {"ciudad": "Manizales A.M.", "tgp": 61.01, "to": 55.93, "td": 8.33, "pct_empleado_particular": 60.12, "pct_cuenta_propia": 27.95, "pct_precarizacion": 31.62, "pct_comercio_alojamiento": 25.27, "cluster": 0, "pc1": 2.31, "pc2": -1.52, "riesgo_psicosocial": "Bajo"}, {"ciudad": "Pasto", "tgp": 69.45, "to": 62.68, "td": 9.74, "pct_empleado_particular": 42.55, "pct_cuenta_propia": 41.97, "pct_precarizacion": 46.76, "pct_comercio_alojamiento": 30.58, "cluster": 2, "pc1": 0.27, "pc2": 2.25, "riesgo_psicosocial": "Alto (Brecha Precarizaci\u00f3n/Informalidad)"}, {"ciudad": "Pereira A.M.", "tgp": 59.75, "to": 55.27, "td": 7.48, "pct_empleado_particular": 58.24, "pct_cuenta_propia": 30.37, "pct_precarizacion": 35.02, "pct_comercio_alojamiento": 28.01, "cluster": 0, "pc1": 1.71, "pc2": -1.15, "riesgo_psicosocial": "Moderado-Bajo"}, {"ciudad": "C\u00facuta A.M.", "tgp": 61.91, "to": 55.94, "td": 9.64, "pct_empleado_particular": 32.01, "pct_cuenta_propia": 59.09, "pct_precarizacion": 62.81, "pct_comercio_alojamiento": 33.36, "cluster": 1, "pc1": -3.16, "pc2": 1.93, "riesgo_psicosocial": "Cr\u00edtico"}, {"ciudad": "Ibagu\u00e9", "tgp": 56.63, "to": 49.41, "td": 12.75, "pct_empleado_particular": 59.56, "pct_cuenta_propia": 30.14, "pct_precarizacion": 33.61, "pct_comercio_alojamiento": 29.73, "cluster": 0, "pc1": 0.66, "pc2": -2.76, "riesgo_psicosocial": "Alto (Presi\u00f3n por Desempleo Abierto)"}, {"ciudad": "Monter\u00eda", "tgp": 63.79, "to": 56.63, "td": 11.22, "pct_empleado_particular": 46.15, "pct_cuenta_propia": 38.61, "pct_precarizacion": 45.79, "pct_comercio_alojamiento": 30.1, "cluster": 2, "pc1": -0.15, "pc2": 0.27, "riesgo_psicosocial": "Alto"}, {"ciudad": "Cartagena", "tgp": 63.32, "to": 54.72, "td": 13.59, "pct_empleado_particular": 36.47, "pct_cuenta_propia": 52.85, "pct_precarizacion": 58.51, "pct_comercio_alojamiento": 29.06, "cluster": 1, "pc1": -2.52, "pc2": 0.63, "riesgo_psicosocial": "Cr\u00edtico"}, {"ciudad": "Villavicencio", "tgp": 69.04, "to": 63.48, "td": 8.06, "pct_empleado_particular": 48.47, "pct_cuenta_propia": 37.35, "pct_precarizacion": 42.66, "pct_comercio_alojamiento": 34.15, "cluster": 2, "pc1": 1.09, "pc2": 2.5, "riesgo_psicosocial": "Moderado-Alto"}, {"ciudad": "Tunja", "tgp": 60.9, "to": 53.33, "td": 12.43, "pct_empleado_particular": 53.18, "pct_cuenta_propia": 29.39, "pct_precarizacion": 32.05, "pct_comercio_alojamiento": 23.84, "cluster": 0, "pc1": 1.31, "pc2": -2.25, "riesgo_psicosocial": "Moderado"}, {"ciudad": "Florencia", "tgp": 59.31, "to": 54.53, "td": 8.06, "pct_empleado_particular": 38.17, "pct_cuenta_propia": 46.89, "pct_precarizacion": 50.94, "pct_comercio_alojamiento": 29.06, "cluster": 1, "pc1": -1.35, "pc2": 0.18, "riesgo_psicosocial": "Alto"}, {"ciudad": "Popay\u00e1n", "tgp": 62.73, "to": 57.59, "td": 8.2, "pct_empleado_particular": 40.11, "pct_cuenta_propia": 43.63, "pct_precarizacion": 48.65, "pct_comercio_alojamiento": 28.61, "cluster": 2, "pc1": -0.52, "pc2": 0.77, "riesgo_psicosocial": "Alto"}, {"ciudad": "Valledupar", "tgp": 58.99, "to": 53.24, "td": 9.75, "pct_empleado_particular": 50.79, "pct_cuenta_propia": 36.05, "pct_precarizacion": 42.68, "pct_comercio_alojamiento": 30.32, "cluster": 2, "pc1": 0.04, "pc2": -0.91, "riesgo_psicosocial": "Moderado-Alto"}, {"ciudad": "Quibd\u00f3", "tgp": 56.74, "to": 43.71, "td": 22.96, "pct_empleado_particular": 35.31, "pct_cuenta_propia": 46.48, "pct_precarizacion": 52.12, "pct_comercio_alojamiento": 25.66, "cluster": 1, "pc1": -3.77, "pc2": -3.44, "riesgo_psicosocial": "Extremo (Desempleo Abierto + Precariedad)"}, {"ciudad": "Neiva", "tgp": 63.66, "to": 57.44, "td": 9.77, "pct_empleado_particular": 48.78, "pct_cuenta_propia": 41.37, "pct_precarizacion": 43.85, "pct_comercio_alojamiento": 30.24, "cluster": 2, "pc1": 0.12, "pc2": 0.5, "riesgo_psicosocial": "Moderado-Alto"}, {"ciudad": "Riohacha", "tgp": 63.15, "to": 55.7, "td": 11.8, "pct_empleado_particular": 27.5, "pct_cuenta_propia": 56.13, "pct_precarizacion": 62.52, "pct_comercio_alojamiento": 25.89, "cluster": 1, "pc1": -2.99, "pc2": 0.96, "riesgo_psicosocial": "Extremo"}, {"ciudad": "Santa Marta", "tgp": 57.37, "to": 52.28, "td": 8.87, "pct_empleado_particular": 48.96, "pct_cuenta_propia": 40.84, "pct_precarizacion": 45.0, "pct_comercio_alojamiento": 32.25, "cluster": 2, "pc1": -0.63, "pc2": -0.68, "riesgo_psicosocial": "Alto"}, {"ciudad": "Armenia", "tgp": 60.97, "to": 55.78, "td": 8.51, "pct_empleado_particular": 48.42, "pct_cuenta_propia": 38.62, "pct_precarizacion": 43.32, "pct_comercio_alojamiento": 29.67, "cluster": 2, "pc1": 0.18, "pc2": -0.11, "riesgo_psicosocial": "Moderado-Alto"}, {"ciudad": "Sincelejo", "tgp": 63.49, "to": 55.25, "td": 12.97, "pct_empleado_particular": 37.61, "pct_cuenta_propia": 47.61, "pct_precarizacion": 54.17, "pct_comercio_alojamiento": 29.23, "cluster": 1, "pc1": -1.82, "pc2": 0.49, "riesgo_psicosocial": "Cr\u00edtico"}];
 
         const clusterDescriptions = {
             0: {
                 name: "Cluster 0: Formales / Consolidados",
                 badgeClass: "badge-cluster-0",
                 desc: "Ciudades con alta proporción de empleo asalariado formal (~58.4%) y menor precarización relativa.",
-                policy: "Incentivos a la innovación tecnológica, atracción de inversión privada y fortalecimiento del empleo calificado."
+                policy: "Incentivos a la innovación tecnológica, atracción de inversión privada y apoyo en salud mental laboral corporativa.",
+                mentalNote: "Menor vulnerabilidad por precarización de subsistencia, pero con riesgos asociados a estrés por desempleo abierto o friccional."
             },
             1: {
                 name: "Cluster 1: Precarización Extrema",
                 badgeClass: "badge-cluster-1",
-                desc: "Mercados laborales con desempleo elevado (~13.2%) e informalidad/cuenta propia dominante (>56%). Vulnerabilidad alta.",
-                policy: "Programas de choque para el empleo juvenil, subsidios condicionados y formalización masiva de microempresas de supervivencia."
+                desc: "Mercados laborales con desempleo elevado (~13.2%) e informalidad/cuenta propia dominante (>56%). Vulnerabilidad social alta.",
+                policy: "Programas de choque para el empleo juvenil, subsidios condicionados y formalización masiva de microempresas de supervivencia.",
+                mentalNote: "Riesgo psicosocial crítico debido a la combinación de desempleo prolongado, pobreza monetaria e incertidumbre diaria de ingresos."
             },
             2: {
                 name: "Cluster 2: Informalidad Urbana (Foco Pasto)",
                 badgeClass: "badge-cluster-2",
                 desc: "Paradoja de Ocupación: Altas tasas de participación por necesidad de subsistencia, pero con precarización cercana al 47%.",
-                policy: "Microcréditos de fomento productivo, reconversión a habilidades digitales y encadenamiento comercial agroindustrial para Nariño."
+                policy: "Microcréditos de fomento productivo, reconversión a habilidades digitales, encadenamiento agroindustrial y brigadas de salud mental comunitaria.",
+                mentalNote: "Burnout de subsistencia: La población no puede permitirse estar desempleada, trabajando extenuantes jornadas informales sin red de protección."
             }
         };
 
         let pcaChartInstance = null;
         let compChartInstance = null;
+        let suicideChartInstance = null;
 
         document.addEventListener('DOMContentLoaded', () => {
             if (window.lucide) lucide.createIcons();
             populateSelect();
             renderTable();
             initCharts();
+            initSuicideChart();
             updateDashboard("Pasto");
         });
 
@@ -298,7 +347,7 @@
                 <div class="bg-slate-800/90 border border-slate-700/80 p-3.5 rounded-xl">
                     <p class="text-xs text-slate-400 font-medium">Tasa de Ocupación (TO)</p>
                     <p class="text-2xl font-bold text-white mt-0.5">${city.to}%</p>
-                    <span class="text-xs text-slate-400">Participación: ${city.tgp}%</span>
+                    <span class="text-xs text-slate-400">Participación (TGP): ${city.tgp}%</span>
                 </div>
                 <div class="bg-slate-800/90 border border-slate-700/80 p-3.5 rounded-xl">
                     <p class="text-xs text-slate-400 font-medium">Tasa de Desocupación (TD)</p>
@@ -311,9 +360,9 @@
                     <span class="text-xs text-slate-400">Cuenta propia + jornaleros</span>
                 </div>
                 <div class="bg-slate-800/90 border border-slate-700/80 p-3.5 rounded-xl">
-                    <p class="text-xs text-slate-400 font-medium">Asalariado Formal Empresa</p>
-                    <p class="text-2xl font-bold text-indigo-400 mt-0.5">${city.pct_empleado_particular}%</p>
-                    <span class="text-xs text-slate-400">Sector privado formal</span>
+                    <p class="text-xs text-slate-400 font-medium">Riesgo Psicosocial Estimado</p>
+                    <p class="text-lg font-bold text-rose-300 mt-1">${city.riesgo_psicosocial}</p>
+                    <span class="text-xs text-slate-400">Carga por precarización/desempleo</span>
                 </div>
             `;
 
@@ -324,14 +373,24 @@
                 </div>
                 <p class="text-xs text-slate-300 leading-relaxed">${cluster.desc}</p>
                 <div class="text-xs bg-slate-900/80 p-3 rounded-lg border border-slate-700/60 space-y-1">
-                    <p><strong class="text-indigo-400">Concentración Comercio/Servicios:</strong> ${city.pct_comercio_alojamiento}%</p>
-                    <p><strong class="text-amber-400">Cuenta Propia / Subsistencia:</strong> ${city.pct_cuenta_propia}%</p>
+                    <p><strong class="text-indigo-400">Asalariado Formal:</strong> ${city.pct_empleado_particular}% | <strong class="text-amber-400">Cuenta Propia:</strong> ${city.pct_cuenta_propia}%</p>
+                    <p><strong class="text-slate-300">Concentración Comercio/Servicios:</strong> ${city.pct_comercio_alojamiento}%</p>
+                </div>
+            `;
+
+            document.getElementById('mental-health-card').innerHTML = `
+                <h4 class="text-xs font-bold text-rose-300 uppercase tracking-wider flex items-center gap-1.5">
+                    <i data-lucide="heart-pulse" class="w-4 h-4 text-rose-400"></i> Impacto en Salud Mental & Factores Psicosociales
+                </h4>
+                <p class="text-xs text-slate-300 leading-relaxed">${cluster.mentalNote}</p>
+                <div class="text-xs bg-rose-950/30 p-2.5 rounded border border-rose-800/40 text-rose-200">
+                    <strong>Reflexión Social:</strong> La angustia financiera y la falta de movilidad social actúan como estresores continuos. En Pasto (72 suicidios registrados en Medicina Legal 2025-2026), el acompañamiento emocional debe integrarse con las políticas de empleo.
                 </div>
             `;
 
             document.getElementById('policy-card').innerHTML = `
                 <h4 class="text-xs font-bold text-indigo-400 uppercase tracking-wider flex items-center gap-1">
-                    <i data-lucide="lightbulb" class="w-3.5 h-3.5"></i> Recomendación de Política Pública
+                    <i data-lucide="lightbulb" class="w-3.5 h-3.5"></i> Propuesta de Política Pública Intersectorial
                 </h4>
                 <p class="text-xs text-slate-300 leading-relaxed">${cluster.policy}</p>
             `;
@@ -346,7 +405,7 @@
 
             const datasets = [0, 1, 2].map(cId => ({
                 label: clusterDescriptions[cId].name,
-                data: cityData.filter(c => c.cluster === cId).map(c => ({ x: -c.pc1, y: -c.pc2, city: c.ciudad })),
+                data: cityData.filter(c => c.cluster === cId).map(c => ({ x: c.pc1, y: c.pc2, city: c.ciudad })),
                 backgroundColor: clusterColors[cId],
                 pointRadius: 6,
                 pointHoverRadius: 9
@@ -425,6 +484,41 @@
             });
         }
 
+        function initSuicideChart() {
+            const ctxSui = document.getElementById('suicideChart').getContext('2d');
+            
+            suicideChartInstance = new Chart(ctxSui, {
+                type: 'bar',
+                data: {
+                    labels: ['Enfermedad Mental', 'Conflicto Pareja', 'Razones Económicas', 'Enfermedad Física', 'Abuso Sustancias', 'Laborales'],
+                    datasets: [
+                        {
+                            label: 'Casos Registrados (Medicina Legal 2025-2026)',
+                            data: [719, 297, 204, 172, 146, 14],
+                            backgroundColor: ['#38bdf8', '#fb7185', '#f59e0b', '#a78bfa', '#f43f5e', '#6366f1']
+                        }
+                    ]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: (ctx) => `${ctx.raw} casos de causa identificada`
+                            }
+                        }
+                    },
+                    scales: {
+                        x: { grid: { color: '#334155' }, ticks: { color: '#94a3b8', font: { size: 9 } } },
+                        y: { grid: { display: false }, ticks: { color: '#cbd5e1', font: { size: 10 } } }
+                    }
+                }
+            });
+        }
+
         function renderTable() {
             const tbody = document.getElementById('data-table-body');
             tbody.innerHTML = cityData.map(c => `
@@ -435,9 +529,8 @@
                     <td>${c.to}%</td>
                     <td>${c.td}%</td>
                     <td style="color: #818cf8; font-weight: 500;">${c.pct_empleado_particular}%</td>
-                    <td>${c.pct_cuenta_propia}%</td>
                     <td style="color: #fbbf24; font-weight: 500;">${c.pct_precarizacion}%</td>
-                    <td>${c.pct_comercio_alojamiento}%</td>
+                    <td style="color: #f43f5e; font-weight: 500;">${c.riesgo_psicosocial}</td>
                 </tr>
             `).join('');
         }
