@@ -117,10 +117,11 @@
 
         #map {
             width: 100%;
-            height: 340px;
+            height: 380px;
             border-radius: 0.75rem;
             border: 1px solid #334155;
             z-index: 1;
+            background-color: #020617;
         }
 
         .table-container {
@@ -157,6 +158,11 @@
             border: 1px solid #334155 !important;
             box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5) !important;
         }
+
+        /* Custom Leaflet tile filter for dark theme OpenStreetMap fallback */
+        .dark-map-tiles {
+            filter: brightness(0.6) invert(1) contrast(3) hue-rotate(200deg) saturate(0.3) brightness(0.7);
+        }
     </style>
 </head>
 <body class="bg-slate-900 text-slate-100 min-h-screen pb-16">
@@ -185,9 +191,10 @@
     <!-- Main Content Container -->
     <main class="max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-8">
 
-        <!-- Selector Principal de Ciudad & Vista de Mapa / Cluster -->
+        <!-- BLOQUE ESTRUCTURAL REORGANIZADO: SELECCIÓN + FICHA DE CLUSTER DEBAJO + MAPA DE COLOMBIA -->
         <section class="card-panel border-indigo-500/40 bg-slate-800/90 shadow-xl space-y-6">
             
+            <!-- 1. Selección de Ciudad -->
             <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
                 <div class="space-y-1 max-w-2xl">
                     <div class="flex items-center gap-2 text-indigo-400 font-semibold text-xs uppercase tracking-wider">
@@ -195,7 +202,7 @@
                     </div>
                     <h2 class="text-lg md:text-xl font-bold text-white">Selecciona una Ciudad para Analizar su Perfil Ocupacional y Psicosocial</h2>
                     <p class="text-xs text-slate-300">
-                        Elige cualquiera de las 23 ciudades en el menú desplegable o interactúa directamente con el mapa de Colombia para filtrar los indicadores.
+                        Elige cualquiera de las 23 ciudades en el menú desplegable para actualizar la información del Cluster y el mapa territorial.
                     </p>
                 </div>
                 
@@ -204,60 +211,40 @@
                         Ciudad en Análisis:
                     </label>
                     <select id="city-select" class="form-control">
-                        <!-- Options generated dynamically -->
+                        <!-- Dynamic Options -->
                     </select>
                 </div>
             </div>
 
-            <!-- Bloque Integrado: Cluster de la Ciudad Seleccionada + Mapa Geográfico de Colombia -->
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch pt-2 border-t border-slate-700/80">
-                
-                <!-- Columna Izquierda: Información de la Ciudad Seleccionada y su Cluster -->
-                <div class="lg:col-span-5 space-y-4 flex flex-col justify-between">
+            <!-- 2. Ficha de Cluster (Ubicada exactamente DEBAJO de la selección de ciudad) -->
+            <div class="p-4 bg-slate-900/90 rounded-xl border border-indigo-500/30 space-y-3" id="top-cluster-info">
+                <!-- Dynamic Content injected here -->
+            </div>
+
+            <!-- 3. Mapa de Colombia por Colores de Cluster (Debajo del Cluster) -->
+            <div class="space-y-3 pt-2 border-t border-slate-700/80">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <span class="text-xs font-bold text-white flex items-center gap-1.5">
+                        <i data-lucide="map" class="w-4 h-4 text-indigo-400"></i> Mapa Geográfico de Colombia - Situación Territorial por Cluster (23 Ciudades)
+                    </span>
                     
-                    <div class="space-y-3" id="top-cluster-info">
-                        <!-- Dynamic Content -->
+                    <!-- Convención rápida de colores -->
+                    <div class="flex flex-wrap items-center gap-3 text-[11px] text-slate-300">
+                        <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span> Cluster 0: Formales</span>
+                        <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span> Cluster 2: Informalidad Urbana</span>
+                        <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span> Cluster 1: Precarización Extrema</span>
                     </div>
-
-                    <!-- Leyenda interactiva de colores de clusters -->
-                    <div class="p-3 bg-slate-900/80 rounded-lg border border-slate-700/80 space-y-2 text-xs">
-                        <span class="font-bold text-slate-300 uppercase tracking-wider text-[11px] block">Convención de Clusters en el Mapa:</span>
-                        <div class="flex flex-col gap-1.5">
-                            <div class="flex items-center gap-2">
-                                <span class="w-3 h-3 rounded-full bg-emerald-500 shrink-0"></span>
-                                <span class="text-slate-300"><strong>Cluster 0 (Verde):</strong> Formales / Consolidados</span>
-                            </div>
-                            <div class="flex items-center gap-2">
-                                <span class="w-3 h-3 rounded-full bg-amber-500 shrink-0"></span>
-                                <span class="text-slate-300"><strong>Cluster 2 (Amarillo):</strong> Precarización/Informalidad Urbana</span>
-                            </div>
-                            <div class="flex items-center gap-2">
-                                <span class="w-3 h-3 rounded-full bg-rose-500 shrink-0"></span>
-                                <span class="text-slate-300"><strong>Cluster 1 (Rojo):</strong> Precarización & Desempleo Crítico</span>
-                            </div>
-                        </div>
-                    </div>
-
                 </div>
 
-                <!-- Columna Derecha: Mapa Interactivo de Colombia con las 23 Ciudades -->
-                <div class="lg:col-span-7 flex flex-col">
-                    <div class="mb-2 flex items-center justify-between">
-                        <span class="text-xs font-bold text-white flex items-center gap-1.5">
-                            <i data-lucide="map" class="w-4 h-4 text-indigo-400"></i> Distribución Territorial por Clusters (23 Ciudades)
-                        </span>
-                        <span class="text-[11px] text-slate-400">Haz clic en cualquier punto del mapa para seleccionar</span>
-                    </div>
-                    <div id="map"></div>
-                </div>
-
+                <div id="map"></div>
+                <p class="text-[11px] text-slate-400 text-right">Haz clic en cualquier punto del mapa para seleccionar esa ciudad en todo el observatorio.</p>
             </div>
 
         </section>
 
 
         <!-- ========================================================================= -->
-        <!-- APARTADO 1: DIMENSIÓN LABORAL, PARADOJA OCUPACIONAL & RECOMENDACIONES -->
+        <!-- APARTADO POR CIUDAD: 1. DIMENSIÓN LABORAL, PARADOJA OCUPACIONAL & POLÍTICAS -->
         <!-- ========================================================================= -->
         <section class="space-y-6">
             
@@ -279,7 +266,7 @@
             <!-- Bloque Integrado: Contexto Laboral + Recomendaciones de Política + Gráfica Comparativa -->
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
                 
-                <!-- Columna Izquierda: Explicación del Contexto Laboral & Bloque de Recomendaciones (MOVIDO AQUÍ) -->
+                <!-- Columna Izquierda: Explicación del Contexto Laboral & Recomendaciones -->
                 <div class="lg:col-span-6 space-y-4 flex flex-col justify-between">
                     
                     <!-- Tarjeta Contexto Laboral y Paradoja Ocupacional -->
@@ -287,7 +274,7 @@
                         <!-- Dynamic Content -->
                     </div>
 
-                    <!-- Tarjeta de Recomendaciones de Política Pública (Reubicado en la sección laboral) -->
+                    <!-- Tarjeta de Recomendaciones de Política Pública para la Ciudad Seleccionada -->
                     <div class="card-panel border-indigo-500/40 bg-slate-800/90 space-y-3" id="policy-recommendations-card">
                         <!-- Dynamic Content -->
                     </div>
@@ -333,7 +320,7 @@
 
 
         <!-- ========================================================================= -->
-        <!-- APARTADO 2: ENFOQUE PSICOSOCIAL & SALUD MENTAL -->
+        <!-- APARTADO POR CIUDAD: 2. ENFOQUE PSICOSOCIAL & SALUD MENTAL -->
         <!-- ========================================================================= -->
         <section class="space-y-6 pt-4 border-t border-slate-800">
             
@@ -373,7 +360,7 @@
             <!-- Bloque de Gráfica de Pastel (Pie Chart) Ampliada con Todas las Causas + Análisis de Salud Mental -->
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
                 
-                <!-- Gráfica de Pastel (Pie Chart) por Ciudad mostrando TODAS las Causas (Enfermedad Mental, Sentimental, Económica, Sustancias, Física, Laboral) -->
+                <!-- Gráfica de Pastel (Pie Chart) por Ciudad mostrando TODAS las Causas -->
                 <div class="lg:col-span-6 card-panel border-rose-500/30 flex flex-col justify-between">
                     <div>
                         <h3 class="text-sm font-bold text-rose-300 flex items-center gap-2 mb-1">
@@ -502,11 +489,14 @@
                 zoomControl: true
             });
 
-            L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-                attribution: '&copy; OpenStreetMap &copy; CARTO',
-                subdomains: 'abcd',
-                maxZoom: 18
-            }).addTo(mapInstance);
+            // Servidor de mapas 100% libre sin API KEY (OpenStreetMap estándar con estilizado o ESRI Canvas Dark)
+            // Se utiliza Esri World Dark Gray Base o TileLayer de OpenStreetMap con filtro oscuro para evitar marcas de agua o claves requeridas.
+            const mapTileLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
+                attribution: 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ',
+                maxZoom: 16
+            });
+
+            mapTileLayer.addTo(mapInstance);
 
             cityData.forEach(city => {
                 const color = clusterDescriptions[city.cluster].colorHex;
@@ -535,23 +525,28 @@
             if (!city) return;
             const cluster = clusterDescriptions[city.cluster];
 
-            // 1. Actualizar Bloque Superior de Cluster
+            // 1. Actualizar Bloque de Cluster (Ubicado DEBAJO de la selección de ciudad)
             document.getElementById('top-cluster-info').innerHTML = `
-                <div class="flex flex-wrap items-center justify-between gap-2">
-                    <h3 class="text-xl font-bold text-white flex items-center gap-2">
-                        <i data-lucide="map-pin" class="w-5 h-5 text-indigo-400"></i> ${city.ciudad}
-                    </h3>
-                    <span class="badge-tag ${cluster.badgeClass}">${cluster.name}</span>
-                </div>
-                <p class="text-xs text-slate-300 leading-relaxed">${cluster.desc}</p>
-                <div class="p-3 bg-slate-900/90 rounded-lg border border-slate-700/80 text-xs space-y-1">
-                    <div class="flex justify-between">
-                        <span class="text-slate-400">Clasificación Territorial:</span>
-                        <strong class="text-indigo-300">Cluster ${city.cluster}</strong>
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-700/80 pb-2">
+                    <div>
+                        <span class="text-xs text-indigo-400 font-semibold uppercase tracking-wider">Resultado del Análisis de Agrupación</span>
+                        <h3 class="text-xl font-bold text-white flex items-center gap-2">
+                            <i data-lucide="map-pin" class="w-5 h-5 text-indigo-400"></i> ${city.ciudad}
+                        </h3>
                     </div>
-                    <div class="flex justify-between">
-                        <span class="text-slate-400">Nivel de Precarización:</span>
-                        <strong class="text-amber-400">${city.pct_precarizacion}%</strong>
+                    <span class="badge-tag ${cluster.badgeClass} text-sm py-1.5 px-3">${cluster.name}</span>
+                </div>
+                
+                <p class="text-xs md:text-sm text-slate-200 leading-relaxed">${cluster.desc}</p>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1 text-xs">
+                    <div class="p-2.5 bg-slate-800/80 rounded-lg border border-slate-700 flex justify-between items-center">
+                        <span class="text-slate-400">Clasificación Territorial:</span>
+                        <strong class="text-indigo-300 font-bold">Cluster ${city.cluster}</strong>
+                    </div>
+                    <div class="p-2.5 bg-slate-800/80 rounded-lg border border-slate-700 flex justify-between items-center">
+                        <span class="text-slate-400">Nivel de Precarización de la Ciudad:</span>
+                        <strong class="text-amber-400 font-bold">${city.pct_precarizacion}%</strong>
                     </div>
                 </div>
             `;
@@ -599,7 +594,7 @@
                 </div>
             `;
 
-            // 4. Actualizar Recomendaciones de Política Pública para ____ (REUBICADO EN SECCIÓN LABORAL)
+            // 4. Actualizar Recomendaciones de Política Pública para ____
             document.getElementById('policy-recommendations-card').innerHTML = `
                 <h4 class="text-xs font-bold text-indigo-300 uppercase tracking-wider flex items-center gap-1.5">
                     <i data-lucide="lightbulb" class="w-4 h-4 text-indigo-400"></i> Recomendaciones de Política Pública para ${city.ciudad}
@@ -637,7 +632,7 @@
 
             // Centrar mapa en la ciudad seleccionada
             if (mapInstance && city.lat && city.lng) {
-                mapInstance.setView([city.lat, city.lng], 9, { animate: true });
+                mapInstance.setView([city.lat, city.lng], 8, { animate: true });
                 if (mapMarkers[city.ciudad]) {
                     mapMarkers[city.ciudad].openTooltip();
                 }
@@ -695,7 +690,6 @@
             const ctxPie = document.getElementById('pieSuicideChart').getContext('2d');
             document.getElementById('pie-city-title').textContent = city.ciudad;
 
-            // Extraer las causas específicas requeridas
             const causas = city.causas || {};
             const labels = [
                 'Enfermedad Mental',
