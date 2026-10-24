@@ -102,8 +102,8 @@
         .chart-wrapper {
             position: relative;
             width: 100%;
-            min-height: 250px;
-            max-height: 320px;
+            min-height: 260px;
+            max-height: 340px;
         }
 
         .section-header {
@@ -115,13 +115,19 @@
             margin-bottom: 1.25rem;
         }
 
+        /* Mapa estático fijado */
         #map {
             width: 100%;
-            height: 380px;
+            height: 340px;
             border-radius: 0.75rem;
             border: 1px solid #334155;
             z-index: 1;
             background-color: #020617;
+            pointer-events: auto;
+        }
+
+        .leaflet-container {
+            background-color: #020617 !important;
         }
 
         .table-container {
@@ -151,17 +157,12 @@
             letter-spacing: 0.05em;
         }
 
-        /* Custom Leaflet popup dark mode */
+        /* Dark mode popups */
         .leaflet-popup-content-wrapper, .leaflet-popup-tip {
             background-color: #0f172a !important;
             color: #f8fafc !important;
             border: 1px solid #334155 !important;
             box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5) !important;
-        }
-
-        /* Custom Leaflet tile filter for dark theme OpenStreetMap fallback */
-        .dark-map-tiles {
-            filter: brightness(0.6) invert(1) contrast(3) hue-rotate(200deg) saturate(0.3) brightness(0.7);
         }
     </style>
 </head>
@@ -191,10 +192,10 @@
     <!-- Main Content Container -->
     <main class="max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-8">
 
-        <!-- BLOQUE ESTRUCTURAL REORGANIZADO: SELECCIÓN + FICHA DE CLUSTER DEBAJO + MAPA DE COLOMBIA -->
+        <!-- MÓDULO UNIFICADO: SELECCIÓN + CLUSTER + UBICACIÓN GEOMÉTRICO-ESTRUCTURAL (PCA) + MAPA ESTÁTICO COLOMBIA -->
         <section class="card-panel border-indigo-500/40 bg-slate-800/90 shadow-xl space-y-6">
             
-            <!-- 1. Selección de Ciudad -->
+            <!-- 1. Encabezado y Selección de Ciudad -->
             <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
                 <div class="space-y-1 max-w-2xl">
                     <div class="flex items-center gap-2 text-indigo-400 font-semibold text-xs uppercase tracking-wider">
@@ -202,7 +203,7 @@
                     </div>
                     <h2 class="text-lg md:text-xl font-bold text-white">Selecciona una Ciudad para Analizar su Perfil Ocupacional y Psicosocial</h2>
                     <p class="text-xs text-slate-300">
-                        Elige cualquiera de las 23 ciudades en el menú desplegable para actualizar la información del Cluster y el mapa territorial.
+                        Selecciona cualquiera de las 23 ciudades para desplegar de inmediato su clasificación por Cluster, su posición en el PCA y su ubicación geográfica.
                     </p>
                 </div>
                 
@@ -221,23 +222,49 @@
                 <!-- Dynamic Content injected here -->
             </div>
 
-            <!-- 3. Mapa de Colombia por Colores de Cluster (Debajo del Cluster) -->
-            <div class="space-y-3 pt-2 border-t border-slate-700/80">
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                    <span class="text-xs font-bold text-white flex items-center gap-1.5">
-                        <i data-lucide="map" class="w-4 h-4 text-indigo-400"></i> Mapa Geográfico de Colombia - Situación Territorial por Cluster (23 Ciudades)
-                    </span>
-                    
-                    <!-- Convención rápida de colores -->
-                    <div class="flex flex-wrap items-center gap-3 text-[11px] text-slate-300">
-                        <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span> Cluster 0: Formales</span>
-                        <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span> Cluster 2: Informalidad Urbana</span>
-                        <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span> Cluster 1: Precarización Extrema</span>
+            <!-- 3. Integración del Módulo PCA + Mapa Estático de Colombia (Pintado por Colores de Cluster) -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch pt-2 border-t border-slate-700/80">
+                
+                <!-- Sub-Módulo A: Ubicación Geométrico-Estructural de las 23 Ciudades (Mapa PCA) -->
+                <div class="lg:col-span-6 bg-slate-900/70 p-4 rounded-xl border border-slate-700 flex flex-col justify-between">
+                    <div>
+                        <h3 class="text-xs font-bold text-indigo-300 uppercase tracking-wider flex items-center gap-1.5 mb-1">
+                            <i data-lucide="scatter-chart" class="w-4 h-4 text-indigo-400"></i> Ubicación Geométrico-Estructural (Mapa PCA)
+                        </h3>
+                        <p class="text-[11px] text-slate-400 mb-2">
+                            Dimensión 1 (PC1: Formalidad vs Informalidad) | Dimensión 2 (PC2: Ocupación vs Desocupación)
+                        </p>
                     </div>
+                    <div class="chart-wrapper my-auto">
+                        <canvas id="pcaChart"></canvas>
+                    </div>
+                    <p class="text-[10px] text-slate-400 text-center mt-1">Puntos agrupados según características socio-laborales de la GEIH</p>
                 </div>
 
-                <div id="map"></div>
-                <p class="text-[11px] text-slate-400 text-right">Haz clic en cualquier punto del mapa para seleccionar esa ciudad en todo el observatorio.</p>
+                <!-- Sub-Módulo B: Mapa Estático Fijo de Colombia (Pintado con Colores de Cluster) -->
+                <div class="lg:col-span-6 bg-slate-900/70 p-4 rounded-xl border border-slate-700 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-1">
+                            <h3 class="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-1.5">
+                                <i data-lucide="map-pin" class="w-4 h-4 text-indigo-400"></i> Mapa Estático de Colombia (23 Ciudades)
+                            </h3>
+                            <span class="text-[10px] bg-indigo-500/20 text-indigo-300 px-2 py-0.5 rounded border border-indigo-500/30 font-semibold">Vista fija territorial</span>
+                        </div>
+                        
+                        <!-- Convención de colores -->
+                        <div class="flex flex-wrap items-center gap-3 text-[10px] text-slate-300 mb-2">
+                            <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span> Cluster 0: Formales</span>
+                            <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span> Cluster 2: Informalidad</span>
+                            <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span> Cluster 1: Precarización</span>
+                        </div>
+                    </div>
+
+                    <!-- Contenedor del Mapa Fijo Estático sin desplazamiento ni zoom accidental -->
+                    <div id="map"></div>
+
+                    <p class="text-[10px] text-slate-400 text-center mt-1">Mapa fijo de referencia territorial. Haz clic en las ciudades etiquetadas para filtrar.</p>
+                </div>
+
             </div>
 
         </section>
@@ -300,19 +327,6 @@
                         </div>
                     </div>
 
-                </div>
-            </div>
-
-            <!-- Mapa PCA de Clusters (Contexto Nacional) -->
-            <div class="card-panel border-slate-700">
-                <div class="mb-3">
-                    <h3 class="text-sm font-bold text-white flex items-center gap-2">
-                        <i data-lucide="scatter-chart" class="w-4 h-4 text-indigo-400"></i> Ubicación Geométrico-Estructural de las 23 Ciudades (Mapa PCA)
-                    </h3>
-                    <p class="text-xs text-slate-400">Dimensión 1 (PC1: Formalidad vs Informalidad) | Dimensión 2 (PC2: Ocupación vs Desocupación)</p>
-                </div>
-                <div class="chart-wrapper" style="min-height: 260px;">
-                    <canvas id="pcaChart"></canvas>
                 </div>
             </div>
 
@@ -464,7 +478,7 @@
             if (window.lucide) lucide.createIcons();
             populateSelect();
             renderTable();
-            initColombiaMap();
+            initColombiaStaticMap();
             initPcaChart();
             updateDashboard("Pasto");
         });
@@ -482,17 +496,23 @@
             select.addEventListener('change', (e) => updateDashboard(e.target.value));
         }
 
-        function initColombiaMap() {
+        /* Mapa Estático Fijo de Colombia (Sin desplazamiento, sin zoom accidental) */
+        function initColombiaStaticMap() {
             mapInstance = L.map('map', {
                 center: [4.5709, -74.2973],
                 zoom: 5,
-                zoomControl: true
+                zoomControl: false,
+                dragging: false,
+                touchZoom: false,
+                doubleClickZoom: false,
+                scrollWheelZoom: false,
+                boxZoom: false,
+                keyboard: false
             });
 
-            // Servidor de mapas 100% libre sin API KEY (OpenStreetMap estándar con estilizado o ESRI Canvas Dark)
-            // Se utiliza Esri World Dark Gray Base o TileLayer de OpenStreetMap con filtro oscuro para evitar marcas de agua o claves requeridas.
+            // Servidor de mapas 100% libre y sin API KEY (Esri World Dark Gray Base)
             const mapTileLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
-                attribution: 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ',
+                attribution: 'Tiles &copy; Esri',
                 maxZoom: 16
             });
 
@@ -500,16 +520,22 @@
 
             cityData.forEach(city => {
                 const color = clusterDescriptions[city.cluster].colorHex;
+                
+                // Marcadores circulares estáticos de las ciudades pintadas por cluster
                 const marker = L.circleMarker([city.lat, city.lng], {
                     radius: 7,
                     fillColor: color,
                     color: '#ffffff',
                     weight: 1.5,
                     opacity: 1,
-                    fillOpacity: 0.85
+                    fillOpacity: 0.9
                 }).addTo(mapInstance);
 
-                marker.bindTooltip(`<strong>${city.ciudad}</strong><br>Cluster ${city.cluster}`, { direction: 'top' });
+                marker.bindTooltip(`<strong>${city.ciudad}</strong><br>Cluster ${city.cluster}`, { 
+                    direction: 'top',
+                    permanent: false,
+                    sticky: true 
+                });
 
                 marker.on('click', () => {
                     document.getElementById('city-select').value = city.ciudad;
@@ -630,12 +656,9 @@
             updatePieSuicideChart(city);
             highlightTableRow(city.ciudad);
 
-            // Centrar mapa en la ciudad seleccionada
-            if (mapInstance && city.lat && city.lng) {
-                mapInstance.setView([city.lat, city.lng], 8, { animate: true });
-                if (mapMarkers[city.ciudad]) {
-                    mapMarkers[city.ciudad].openTooltip();
-                }
+            // Destacar marcador en el mapa estático fijado sin desplazar la vista general de Colombia
+            if (mapMarkers[city.ciudad]) {
+                mapMarkers[city.ciudad].openTooltip();
             }
         }
 
