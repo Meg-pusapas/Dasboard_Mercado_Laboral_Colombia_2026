@@ -23,6 +23,10 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Leaflet CSS & JS for Interactive Map -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
         
@@ -111,6 +115,14 @@
             margin-bottom: 1.25rem;
         }
 
+        #map {
+            width: 100%;
+            height: 340px;
+            border-radius: 0.75rem;
+            border: 1px solid #334155;
+            z-index: 1;
+        }
+
         .table-container {
             width: 100%;
             overflow-x: auto;
@@ -136,6 +148,14 @@
             text-transform: uppercase;
             font-size: 0.6875rem;
             letter-spacing: 0.05em;
+        }
+
+        /* Custom Leaflet popup dark mode */
+        .leaflet-popup-content-wrapper, .leaflet-popup-tip {
+            background-color: #0f172a !important;
+            color: #f8fafc !important;
+            border: 1px solid #334155 !important;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5) !important;
         }
     </style>
 </head>
@@ -165,16 +185,17 @@
     <!-- Main Content Container -->
     <main class="max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-8">
 
-        <!-- Selector Principal de Ciudad (Global Control) -->
-        <section class="card-panel border-indigo-500/40 bg-slate-800/90 shadow-xl">
+        <!-- Selector Principal de Ciudad & Vista de Mapa / Cluster -->
+        <section class="card-panel border-indigo-500/40 bg-slate-800/90 shadow-xl space-y-6">
+            
             <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
                 <div class="space-y-1 max-w-2xl">
                     <div class="flex items-center gap-2 text-indigo-400 font-semibold text-xs uppercase tracking-wider">
-                        <i data-lucide="sliders" class="w-4 h-4"></i> Módulo de Análisis Comparativo Interactivo
+                        <i data-lucide="sliders" class="w-4 h-4"></i> Módulo de Selección e Identificación Territorial
                     </div>
-                    <h2 class="text-lg md:text-xl font-bold text-white">Selecciona una Ciudad para Explorar sus Indicadores</h2>
+                    <h2 class="text-lg md:text-xl font-bold text-white">Selecciona una Ciudad para Analizar su Perfil Ocupacional y Psicosocial</h2>
                     <p class="text-xs text-slate-300">
-                        Elige cualquiera de las 23 ciudades capitales y áreas metropolitanas para sincronizar dinámicamente los bloques laborales, la segmentación en cluster, los gráficos comparativos, las estadísticas de salud mental y las recomendaciones específicas.
+                        Elige cualquiera de las 23 ciudades en el menú desplegable o interactúa directamente con el mapa de Colombia para filtrar los indicadores.
                     </p>
                 </div>
                 
@@ -187,11 +208,56 @@
                     </select>
                 </div>
             </div>
+
+            <!-- Bloque Integrado: Cluster de la Ciudad Seleccionada + Mapa Geográfico de Colombia -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch pt-2 border-t border-slate-700/80">
+                
+                <!-- Columna Izquierda: Información de la Ciudad Seleccionada y su Cluster -->
+                <div class="lg:col-span-5 space-y-4 flex flex-col justify-between">
+                    
+                    <div class="space-y-3" id="top-cluster-info">
+                        <!-- Dynamic Content -->
+                    </div>
+
+                    <!-- Leyenda interactiva de colores de clusters -->
+                    <div class="p-3 bg-slate-900/80 rounded-lg border border-slate-700/80 space-y-2 text-xs">
+                        <span class="font-bold text-slate-300 uppercase tracking-wider text-[11px] block">Convención de Clusters en el Mapa:</span>
+                        <div class="flex flex-col gap-1.5">
+                            <div class="flex items-center gap-2">
+                                <span class="w-3 h-3 rounded-full bg-emerald-500 shrink-0"></span>
+                                <span class="text-slate-300"><strong>Cluster 0 (Verde):</strong> Formales / Consolidados</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="w-3 h-3 rounded-full bg-amber-500 shrink-0"></span>
+                                <span class="text-slate-300"><strong>Cluster 2 (Amarillo):</strong> Precarización/Informalidad Urbana</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="w-3 h-3 rounded-full bg-rose-500 shrink-0"></span>
+                                <span class="text-slate-300"><strong>Cluster 1 (Rojo):</strong> Precarización & Desempleo Crítico</span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Columna Derecha: Mapa Interactivo de Colombia con las 23 Ciudades -->
+                <div class="lg:col-span-7 flex flex-col">
+                    <div class="mb-2 flex items-center justify-between">
+                        <span class="text-xs font-bold text-white flex items-center gap-1.5">
+                            <i data-lucide="map" class="w-4 h-4 text-indigo-400"></i> Distribución Territorial por Clusters (23 Ciudades)
+                        </span>
+                        <span class="text-[11px] text-slate-400">Haz clic en cualquier punto del mapa para seleccionar</span>
+                    </div>
+                    <div id="map"></div>
+                </div>
+
+            </div>
+
         </section>
 
 
         <!-- ========================================================================= -->
-        <!-- APARTADO 1: DIMENSIÓN LABORAL E INDICADORES DE EMPLEO -->
+        <!-- APARTADO 1: DIMENSIÓN LABORAL, PARADOJA OCUPACIONAL & RECOMENDACIONES -->
         <!-- ========================================================================= -->
         <section class="space-y-6">
             
@@ -200,8 +266,8 @@
                     <i data-lucide="briefcase" class="w-5 h-5"></i>
                 </div>
                 <div>
-                    <h2 class="text-lg md:text-xl font-bold text-white">1. Dimensión Laboral & Estructura del Empleo</h2>
-                    <p class="text-xs text-slate-400">Tasas clave de desocupación, subocupación, calidad contractual y tipificación de cluster laboral</p>
+                    <h2 class="text-lg md:text-xl font-bold text-white">1. Dimensión Laboral, Paradoja Ocupacional & Políticas Públicas</h2>
+                    <p class="text-xs text-slate-400">Indicadores de ocupación, calidad contractual, diagnóstico del contexto laboral y recomendaciones</p>
                 </div>
             </div>
 
@@ -210,41 +276,47 @@
                 <!-- Dynamic KPI Cards -->
             </div>
 
-            <!-- Bloque Integrado: Contexto Laboral + Cluster + Gráfica Comparativa -->
+            <!-- Bloque Integrado: Contexto Laboral + Recomendaciones de Política + Gráfica Comparativa -->
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
                 
-                <!-- Columna Izquierda: Información de Ciudad, Cluster y Explicación -->
+                <!-- Columna Izquierda: Explicación del Contexto Laboral & Bloque de Recomendaciones (MOVIDO AQUÍ) -->
                 <div class="lg:col-span-6 space-y-4 flex flex-col justify-between">
                     
-                    <!-- Tarjeta Contexto de la Ciudad y Cluster -->
-                    <div class="card-panel space-y-4 border-slate-700 bg-slate-800/90 h-full flex flex-col justify-between" id="city-cluster-card">
+                    <!-- Tarjeta Contexto Laboral y Paradoja Ocupacional -->
+                    <div class="card-panel space-y-4 border-slate-700 bg-slate-800/90" id="city-labor-context-card">
+                        <!-- Dynamic Content -->
+                    </div>
+
+                    <!-- Tarjeta de Recomendaciones de Política Pública (Reubicado en la sección laboral) -->
+                    <div class="card-panel border-indigo-500/40 bg-slate-800/90 space-y-3" id="policy-recommendations-card">
                         <!-- Dynamic Content -->
                     </div>
 
                 </div>
 
-                <!-- Columna Derecha: Gráfica "Asalariado Formal vs. Precarización" y Mapa PCA -->
-                <div class="lg:col-span-6 space-y-4">
+                <!-- Columna Derecha: Gráfica "Asalariado Formal vs. Precarización" -->
+                <div class="lg:col-span-6 space-y-4 flex flex-col justify-between">
                     
                     <!-- Gráfica Comparativa: Asalariado Formal vs Precarización -->
-                    <div class="card-panel border-slate-700">
-                        <div class="mb-3 flex justify-between items-start">
-                            <div>
-                                <h3 class="text-sm font-bold text-white flex items-center gap-2">
-                                    <i data-lucide="bar-chart-2" class="w-4 h-4 text-indigo-400"></i> Asalariado Formal vs. Precarización
-                                </h3>
-                                <p class="text-xs text-slate-400" id="comp-chart-subtitle">Comparativo de la ciudad seleccionada contra su Cluster y promedio nacional</p>
-                            </div>
+                    <div class="card-panel border-slate-700 h-full flex flex-col justify-between">
+                        <div>
+                            <h3 class="text-sm font-bold text-white flex items-center gap-2 mb-1">
+                                <i data-lucide="bar-chart-2" class="w-4 h-4 text-indigo-400"></i> Asalariado Formal vs. Precarización
+                            </h3>
+                            <p class="text-xs text-slate-400 mb-3" id="comp-chart-subtitle">Comparativo de la ciudad seleccionada contra su Cluster y el promedio de las 23 ciudades</p>
                         </div>
-                        <div class="chart-wrapper">
+                        <div class="chart-wrapper my-auto">
                             <canvas id="compChart"></canvas>
+                        </div>
+                        <div class="mt-2 text-[11px] text-slate-400 bg-slate-900/60 p-2.5 rounded border border-slate-700/60">
+                            <strong>Brecha de Calidad:</strong> Compara la fuerza del sector privado asalariado formal frente a los trabajadores vulnerables por cuenta propia o informales.
                         </div>
                     </div>
 
                 </div>
             </div>
 
-            <!-- Mapa PCA de Clusters (Contexto Nacional de 23 Ciudades) -->
+            <!-- Mapa PCA de Clusters (Contexto Nacional) -->
             <div class="card-panel border-slate-700">
                 <div class="mb-3">
                     <h3 class="text-sm font-bold text-white flex items-center gap-2">
@@ -275,7 +347,7 @@
                 </div>
             </div>
 
-            <!-- Bloque Requerido: Hallazgo Clave "Precarización vs. Salud Mental" -->
+            <!-- Bloque: Hallazgo Clave "Precarización vs. Salud Mental" -->
             <section class="card-panel border-rose-500/40 bg-gradient-to-r from-slate-900 via-slate-800 to-rose-950/40 shadow-lg">
                 <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
                     <div class="space-y-2">
@@ -298,19 +370,19 @@
                 </div>
             </section>
 
-            <!-- Bloque de Gráfica de Pastel (Pie Chart) y Análisis de Salud Mental -->
+            <!-- Bloque de Gráfica de Pastel (Pie Chart) Ampliada con Todas las Causas + Análisis de Salud Mental -->
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
                 
-                <!-- Gráfica de Pastel (Pie Chart) por Ciudad -->
-                <div class="lg:col-span-5 card-panel border-rose-500/30 flex flex-col justify-between">
+                <!-- Gráfica de Pastel (Pie Chart) por Ciudad mostrando TODAS las Causas (Enfermedad Mental, Sentimental, Económica, Sustancias, Física, Laboral) -->
+                <div class="lg:col-span-6 card-panel border-rose-500/30 flex flex-col justify-between">
                     <div>
                         <h3 class="text-sm font-bold text-rose-300 flex items-center gap-2 mb-1">
-                            <i data-lucide="pie-chart" class="w-4 h-4 text-rose-400"></i> Distribución de Causas de Suicidio en <span id="pie-city-title" class="text-white"></span>
+                            <i data-lucide="pie-chart" class="w-4 h-4 text-rose-400"></i> Desglose de Causas de Lesiones Fatales en <span id="pie-city-title" class="text-white"></span>
                         </h3>
-                        <p class="text-xs text-slate-400 mb-3">Participación porcentual según registros de Medicina Legal (2025–2026)</p>
+                        <p class="text-xs text-slate-400 mb-3">Distribución por desencadenantes (Enfermedad Mental, Sentimental, Económica, Sustancias, Física y Laboral)</p>
                     </div>
                     
-                    <div class="chart-wrapper flex items-center justify-center my-auto" style="min-height: 240px;">
+                    <div class="chart-wrapper flex items-center justify-center my-auto" style="min-height: 280px;">
                         <canvas id="pieSuicideChart"></canvas>
                     </div>
 
@@ -319,19 +391,9 @@
                     </div>
                 </div>
 
-                <!-- Análisis Psicosocial Detallado & Propuestas de Política Pública por Ciudad -->
-                <div class="lg:col-span-7 space-y-4 flex flex-col justify-between">
-                    
-                    <!-- Tarjeta Datos y Análisis de Salud Mental -->
-                    <div class="card-panel border-rose-500/30 bg-slate-800/90 space-y-3" id="mental-health-analysis-card">
-                        <!-- Dynamic Content -->
-                    </div>
-
-                    <!-- Tarjeta Recomendaciones por Ciudad -->
-                    <div class="card-panel border-indigo-500/30 bg-slate-800/90 space-y-3" id="policy-recommendations-card">
-                        <!-- Dynamic Content -->
-                    </div>
-
+                <!-- Tarjeta Datos y Análisis de Salud Mental en Cuestiones Laborales -->
+                <div class="lg:col-span-6 card-panel border-rose-500/30 bg-slate-800/90 space-y-4 flex flex-col justify-between" id="mental-health-analysis-card">
+                    <!-- Dynamic Content -->
                 </div>
 
             </div>
@@ -347,7 +409,7 @@
                 <h3 class="text-sm md:text-base font-bold text-white flex items-center gap-2">
                     <i data-lucide="table" class="w-4 h-4 text-indigo-400"></i> Matriz Completa de Indicadores GEIH & Medicina Legal (23 Ciudades)
                 </h3>
-                <span class="text-xs text-slate-400">Haz clic en el selector superior para destacar una ciudad</span>
+                <span class="text-xs text-slate-400">Haz clic en cualquier fila para seleccionar la ciudad en todo el tablero</span>
             </div>
             
             <div class="table-container">
@@ -376,12 +438,13 @@
     </main>
 
     <script>
-        const cityData = [{"ciudad": "Bogot\u00e1 D.C.", "tgp": 69.83, "to": 64.21, "td": 8.05, "tsub": 8.12, "pct_empleado_particular": 59.09, "pct_cuenta_propia": 30.51, "pct_precarizacion": 33.68, "pct_comercio_alojamiento": 23.48, "cluster": 0, "pc1": 1.85, "pc2": 1.12, "suicidios_totales": 550, "suicidios_con_razon": 214, "suicidios_eco_lab": 24, "pct_eco_conocido": 11.2, "riesgo_psicosocial": "Moderado (Incidencia Econ\u00f3mica 8%-14%)"}, {"ciudad": "Medell\u00edn A.M.", "tgp": 67.35, "to": 62.66, "td": 6.97, "tsub": 7.45, "pct_empleado_particular": 60.2, "pct_cuenta_propia": 30.12, "pct_precarizacion": 33.16, "pct_comercio_alojamiento": 26.43, "cluster": 0, "pc1": 1.92, "pc2": 0.85, "suicidios_totales": 313, "suicidios_con_razon": 170, "suicidios_eco_lab": 11, "pct_eco_conocido": 6.5, "riesgo_psicosocial": "Bajo / Sin Registros Directos (<8%)"}, {"ciudad": "Cali A.M.", "tgp": 64.26, "to": 58.55, "td": 8.89, "tsub": 9.3, "pct_empleado_particular": 55.19, "pct_cuenta_propia": 35.35, "pct_precarizacion": 39.41, "pct_comercio_alojamiento": 30.09, "cluster": 2, "pc1": 0.21, "pc2": -0.15, "suicidios_totales": 176, "suicidios_con_razon": 36, "suicidios_eco_lab": 6, "pct_eco_conocido": 16.7, "riesgo_psicosocial": "Alto (Incidencia Econ\u00f3mica 14%-20%)"}, {"ciudad": "Barranquilla A.M.", "tgp": 61.31, "to": 56.04, "td": 8.6, "tsub": 8.9, "pct_empleado_particular": 51.64, "pct_cuenta_propia": 37.12, "pct_precarizacion": 43.05, "pct_comercio_alojamiento": 28.63, "cluster": 2, "pc1": -0.45, "pc2": -0.72, "suicidios_totales": 68, "suicidios_con_razon": 37, "suicidios_eco_lab": 4, "pct_eco_conocido": 10.8, "riesgo_psicosocial": "Moderado (Incidencia Econ\u00f3mica 8%-14%)"}, {"ciudad": "Bucaramanga A.M.", "tgp": 65.24, "to": 60.51, "td": 7.24, "tsub": 7.8, "pct_empleado_particular": 51.51, "pct_cuenta_propia": 37.77, "pct_precarizacion": 42.24, "pct_comercio_alojamiento": 28.2, "cluster": 2, "pc1": -0.32, "pc2": 0.35, "suicidios_totales": 49, "suicidios_con_razon": 26, "suicidios_eco_lab": 0, "pct_eco_conocido": 0.0, "riesgo_psicosocial": "Bajo / Sin Registros Directos (<8%)"}, {"ciudad": "Manizales A.M.", "tgp": 61.01, "to": 55.93, "td": 8.33, "tsub": 8.5, "pct_empleado_particular": 60.12, "pct_cuenta_propia": 27.95, "pct_precarizacion": 31.62, "pct_comercio_alojamiento": 25.27, "cluster": 0, "pc1": 1.75, "pc2": -0.85, "suicidios_totales": 55, "suicidios_con_razon": 31, "suicidios_eco_lab": 6, "pct_eco_conocido": 19.4, "riesgo_psicosocial": "Alto (Incidencia Econ\u00f3mica 14%-20%)"}, {"ciudad": "Pasto", "tgp": 69.45, "to": 62.68, "td": 9.74, "tsub": 10.4, "pct_empleado_particular": 42.55, "pct_cuenta_propia": 41.97, "pct_precarizacion": 46.76, "pct_comercio_alojamiento": 30.58, "cluster": 2, "pc1": -0.88, "pc2": 1.05, "suicidios_totales": 72, "suicidios_con_razon": 48, "suicidios_eco_lab": 7, "pct_eco_conocido": 14.6, "riesgo_psicosocial": "Alto (Incidencia Econ\u00f3mica 14%-20%)"}, {"ciudad": "Pereira A.M.", "tgp": 59.75, "to": 55.27, "td": 7.48, "tsub": 7.9, "pct_empleado_particular": 58.24, "pct_cuenta_propia": 30.37, "pct_precarizacion": 35.02, "pct_comercio_alojamiento": 28.01, "cluster": 0, "pc1": 1.45, "pc2": -1.1, "suicidios_totales": 44, "suicidios_con_razon": 34, "suicidios_eco_lab": 3, "pct_eco_conocido": 8.8, "riesgo_psicosocial": "Moderado (Incidencia Econ\u00f3mica 8%-14%)"}, {"ciudad": "C\u00facuta A.M.", "tgp": 61.91, "to": 55.94, "td": 9.64, "tsub": 11.2, "pct_empleado_particular": 32.01, "pct_cuenta_propia": 59.09, "pct_precarizacion": 62.81, "pct_comercio_alojamiento": 33.36, "cluster": 1, "pc1": -2.85, "pc2": -0.25, "suicidios_totales": 47, "suicidios_con_razon": 9, "suicidios_eco_lab": 2, "pct_eco_conocido": 22.2, "riesgo_psicosocial": "Cr\u00edtico (Incidencia Econ\u00f3mica >20%)"}, {"ciudad": "Ibagu\u00e9", "tgp": 56.63, "to": 49.41, "td": 12.75, "tsub": 12.1, "pct_empleado_particular": 59.56, "pct_cuenta_propia": 30.14, "pct_precarizacion": 33.61, "pct_comercio_alojamiento": 29.73, "cluster": 0, "pc1": 1.15, "pc2": -2.1, "suicidios_totales": 72, "suicidios_con_razon": 27, "suicidios_eco_lab": 0, "pct_eco_conocido": 0.0, "riesgo_psicosocial": "Bajo / Sin Registros Directos (<8%)"}, {"ciudad": "Monter\u00eda", "tgp": 63.79, "to": 56.63, "td": 11.22, "tsub": 11.8, "pct_empleado_particular": 46.15, "pct_cuenta_propia": 38.61, "pct_precarizacion": 45.79, "pct_comercio_alojamiento": 30.1, "cluster": 2, "pc1": -0.75, "pc2": -0.1, "suicidios_totales": 29, "suicidios_con_razon": 6, "suicidios_eco_lab": 0, "pct_eco_conocido": 0.0, "riesgo_psicosocial": "Bajo / Sin Registros Directos (<8%)"}, {"ciudad": "Cartagena", "tgp": 63.32, "to": 54.72, "td": 13.59, "tsub": 12.9, "pct_empleado_particular": 36.47, "pct_cuenta_propia": 52.85, "pct_precarizacion": 58.51, "pct_comercio_alojamiento": 29.06, "cluster": 1, "pc1": -2.15, "pc2": -0.85, "suicidios_totales": 66, "suicidios_con_razon": 43, "suicidios_eco_lab": 9, "pct_eco_conocido": 20.9, "riesgo_psicosocial": "Cr\u00edtico (Incidencia Econ\u00f3mica >20%)"}, {"ciudad": "Villavicencio", "tgp": 69.04, "to": 63.48, "td": 8.06, "tsub": 8.6, "pct_empleado_particular": 48.47, "pct_cuenta_propia": 37.35, "pct_precarizacion": 42.66, "pct_comercio_alojamiento": 34.15, "cluster": 2, "pc1": -0.35, "pc2": 1.25, "suicidios_totales": 52, "suicidios_con_razon": 26, "suicidios_eco_lab": 4, "pct_eco_conocido": 15.4, "riesgo_psicosocial": "Alto (Incidencia Econ\u00f3mica 14%-20%)"}, {"ciudad": "Tunja", "tgp": 60.9, "to": 53.33, "td": 12.43, "tsub": 11.5, "pct_empleado_particular": 53.18, "pct_cuenta_propia": 29.39, "pct_precarizacion": 32.05, "pct_comercio_alojamiento": 23.84, "cluster": 0, "pc1": 1.2, "pc2": -1.35, "suicidios_totales": 19, "suicidios_con_razon": 10, "suicidios_eco_lab": 1, "pct_eco_conocido": 10.0, "riesgo_psicosocial": "Moderado (Incidencia Econ\u00f3mica 8%-14%)"}, {"ciudad": "Florencia", "tgp": 59.31, "to": 54.53, "td": 8.06, "tsub": 9.1, "pct_empleado_particular": 38.17, "pct_cuenta_propia": 46.89, "pct_precarizacion": 50.94, "pct_comercio_alojamiento": 29.06, "cluster": 1, "pc1": -1.45, "pc2": -0.95, "suicidios_totales": 25, "suicidios_con_razon": 20, "suicidios_eco_lab": 5, "pct_eco_conocido": 25.0, "riesgo_psicosocial": "Cr\u00edtico (Incidencia Econ\u00f3mica >20%)"}, {"ciudad": "Popay\u00e1n", "tgp": 62.73, "to": 57.59, "td": 8.2, "tsub": 9.4, "pct_empleado_particular": 40.11, "pct_cuenta_propia": 43.63, "pct_precarizacion": 48.65, "pct_comercio_alojamiento": 28.61, "cluster": 2, "pc1": -1.1, "pc2": -0.15, "suicidios_totales": 43, "suicidios_con_razon": 17, "suicidios_eco_lab": 2, "pct_eco_conocido": 11.8, "riesgo_psicosocial": "Moderado (Incidencia Econ\u00f3mica 8%-14%)"}, {"ciudad": "Valledupar", "tgp": 58.99, "to": 53.24, "td": 9.75, "tsub": 10.2, "pct_empleado_particular": 50.79, "pct_cuenta_propia": 36.05, "pct_precarizacion": 42.68, "pct_comercio_alojamiento": 30.32, "cluster": 2, "pc1": -0.4, "pc2": -1.2, "suicidios_totales": 31, "suicidios_con_razon": 6, "suicidios_eco_lab": 1, "pct_eco_conocido": 16.7, "riesgo_psicosocial": "Alto (Incidencia Econ\u00f3mica 14%-20%)"}, {"ciudad": "Quibd\u00f3", "tgp": 56.74, "to": 43.71, "td": 22.96, "tsub": 18.5, "pct_empleado_particular": 35.31, "pct_cuenta_propia": 46.48, "pct_precarizacion": 52.12, "pct_comercio_alojamiento": 25.66, "cluster": 1, "pc1": -2.95, "pc2": -2.8, "suicidios_totales": 5, "suicidios_con_razon": 1, "suicidios_eco_lab": 0, "pct_eco_conocido": 0.0, "riesgo_psicosocial": "Bajo / Sin Registros Directos (<8%)"}, {"ciudad": "Neiva", "tgp": 63.66, "to": 57.44, "td": 9.77, "tsub": 10.1, "pct_empleado_particular": 48.78, "pct_cuenta_propia": 41.37, "pct_precarizacion": 43.85, "pct_comercio_alojamiento": 30.24, "cluster": 2, "pc1": -0.55, "pc2": 0.05, "suicidios_totales": 29, "suicidios_con_razon": 12, "suicidios_eco_lab": 0, "pct_eco_conocido": 0.0, "riesgo_psicosocial": "Bajo / Sin Registros Directos (<8%)"}, {"ciudad": "Riohacha", "tgp": 63.15, "to": 55.7, "td": 11.8, "tsub": 13.1, "pct_empleado_particular": 27.5, "pct_cuenta_propia": 56.13, "pct_precarizacion": 62.52, "pct_comercio_alojamiento": 25.89, "cluster": 1, "pc1": -2.75, "pc2": -0.65, "suicidios_totales": 16, "suicidios_con_razon": 6, "suicidios_eco_lab": 1, "pct_eco_conocido": 16.7, "riesgo_psicosocial": "Alto (Incidencia Econ\u00f3mica 14%-20%)"}, {"ciudad": "Santa Marta", "tgp": 57.37, "to": 52.28, "td": 8.87, "tsub": 9.2, "pct_empleado_particular": 48.96, "pct_cuenta_propia": 40.84, "pct_precarizacion": 45.0, "pct_comercio_alojamiento": 32.25, "cluster": 2, "pc1": -0.68, "pc2": -1.35, "suicidios_totales": 37, "suicidios_con_razon": 12, "suicidios_eco_lab": 1, "pct_eco_conocido": 8.3, "riesgo_psicosocial": "Moderado (Incidencia Econ\u00f3mica 8%-14%)"}, {"ciudad": "Armenia", "tgp": 60.97, "to": 55.78, "td": 8.51, "tsub": 9.0, "pct_empleado_particular": 48.42, "pct_cuenta_propia": 38.62, "pct_precarizacion": 43.32, "pct_comercio_alojamiento": 29.67, "cluster": 2, "pc1": -0.42, "pc2": -0.8, "suicidios_totales": 39, "suicidios_con_razon": 10, "suicidios_eco_lab": 2, "pct_eco_conocido": 20.0, "riesgo_psicosocial": "Cr\u00edtico (Incidencia Econ\u00f3mica >20%)"}, {"ciudad": "Sincelejo", "tgp": 63.49, "to": 55.25, "td": 12.97, "tsub": 13.8, "pct_empleado_particular": 37.61, "pct_cuenta_propia": 47.61, "pct_precarizacion": 54.17, "pct_comercio_alojamiento": 29.23, "cluster": 1, "pc1": -1.85, "pc2": -0.75, "suicidios_totales": 22, "suicidios_con_razon": 17, "suicidios_eco_lab": 4, "pct_eco_conocido": 23.5, "riesgo_psicosocial": "Cr\u00edtico (Incidencia Econ\u00f3mica >20%)"}];
+        const cityData = [{"ciudad": "Bogot\u00e1 D.C.", "lat": 4.711, "lng": -74.0721, "tgp": 69.83, "to": 64.21, "td": 8.05, "tsub": 8.12, "pct_empleado_particular": 59.09, "pct_cuenta_propia": 30.51, "pct_precarizacion": 33.68, "pct_comercio_alojamiento": 23.48, "cluster": 0, "pc1": 1.85, "pc2": 1.12, "suicidios_totales": 550, "suicidios_con_razon": 214, "suicidios_eco_lab": 24, "pct_eco_conocido": 11.2, "riesgo_psicosocial": "Moderado (Incidencia Econ\u00f3mica 8%-14%)", "causas": {"Enfermedad Mental": 82, "Conflicto de Pareja / Sentimental": 38, "Econ\u00f3micas": 22, "Enfermedad F\u00edsica": 20, "Abuso de Sustancias / Alcohol": 18, "Laborales": 2, "Otras / Sin Informaci\u00f3n": 368}}, {"ciudad": "Medell\u00edn A.M.", "lat": 6.2442, "lng": -75.5812, "tgp": 67.35, "to": 62.66, "td": 6.97, "tsub": 7.45, "pct_empleado_particular": 60.2, "pct_cuenta_propia": 30.12, "pct_precarizacion": 33.16, "pct_comercio_alojamiento": 26.43, "cluster": 0, "pc1": 1.92, "pc2": 0.85, "suicidios_totales": 313, "suicidios_con_razon": 170, "suicidios_eco_lab": 11, "pct_eco_conocido": 6.5, "riesgo_psicosocial": "Bajo / Sin Registros Directos (<8%)", "causas": {"Enfermedad Mental": 78, "Conflicto de Pareja / Sentimental": 34, "Econ\u00f3micas": 10, "Enfermedad F\u00edsica": 16, "Abuso de Sustancias / Alcohol": 14, "Laborales": 1, "Otras / Sin Informaci\u00f3n": 160}}, {"ciudad": "Cali A.M.", "lat": 3.4516, "lng": -76.532, "tgp": 64.26, "to": 58.55, "td": 8.89, "tsub": 9.3, "pct_empleado_particular": 55.19, "pct_cuenta_propia": 35.35, "pct_precarizacion": 39.41, "pct_comercio_alojamiento": 30.09, "cluster": 2, "pc1": 0.21, "pc2": -0.15, "suicidios_totales": 176, "suicidios_con_razon": 36, "suicidios_eco_lab": 6, "pct_eco_conocido": 16.7, "riesgo_psicosocial": "Alto (Incidencia Econ\u00f3mica 14%-20%)", "causas": {"Enfermedad Mental": 14, "Conflicto de Pareja / Sentimental": 8, "Econ\u00f3micas": 5, "Enfermedad F\u00edsica": 4, "Abuso de Sustancias / Alcohol": 3, "Laborales": 1, "Otras / Sin Informaci\u00f3n": 141}}, {"ciudad": "Barranquilla A.M.", "lat": 10.9685, "lng": -74.7813, "tgp": 61.31, "to": 56.04, "td": 8.6, "tsub": 8.9, "pct_empleado_particular": 51.64, "pct_cuenta_propia": 37.12, "pct_precarizacion": 43.05, "pct_comercio_alojamiento": 28.63, "cluster": 2, "pc1": -0.45, "pc2": -0.72, "suicidios_totales": 68, "suicidios_con_razon": 37, "suicidios_eco_lab": 4, "pct_eco_conocido": 10.8, "riesgo_psicosocial": "Moderado (Incidencia Econ\u00f3mica 8%-14%)", "causas": {"Enfermedad Mental": 15, "Conflicto de Pareja / Sentimental": 10, "Econ\u00f3micas": 4, "Enfermedad F\u00edsica": 3, "Abuso de Sustancias / Alcohol": 2, "Laborales": 0, "Otras / Sin Informaci\u00f3n": 34}}, {"ciudad": "Bucaramanga A.M.", "lat": 7.1254, "lng": -73.1198, "tgp": 65.24, "to": 60.51, "td": 7.24, "tsub": 7.8, "pct_empleado_particular": 51.51, "pct_cuenta_propia": 37.77, "pct_precarizacion": 42.24, "pct_comercio_alojamiento": 28.2, "cluster": 2, "pc1": -0.32, "pc2": 0.35, "suicidios_totales": 49, "suicidios_con_razon": 26, "suicidios_eco_lab": 0, "pct_eco_conocido": 0.0, "riesgo_psicosocial": "Bajo / Sin Registros Directos (<8%)", "causas": {"Enfermedad Mental": 12, "Conflicto de Pareja / Sentimental": 7, "Enfermedad F\u00edsica": 4, "Abuso de Sustancias / Alcohol": 2, "Econ\u00f3micas": 0, "Laborales": 0, "Otras / Sin Informaci\u00f3n": 24}}, {"ciudad": "Manizales A.M.", "lat": 5.0703, "lng": -75.5138, "tgp": 61.01, "to": 55.93, "td": 8.33, "tsub": 8.5, "pct_empleado_particular": 60.12, "pct_cuenta_propia": 27.95, "pct_precarizacion": 31.62, "pct_comercio_alojamiento": 25.27, "cluster": 0, "pc1": 1.75, "pc2": -0.85, "suicidios_totales": 55, "suicidios_con_razon": 31, "suicidios_eco_lab": 6, "pct_eco_conocido": 19.4, "riesgo_psicosocial": "Alto (Incidencia Econ\u00f3mica 14%-20%)", "causas": {"Enfermedad Mental": 12, "Conflicto de Pareja / Sentimental": 6, "Econ\u00f3micas": 5, "Enfermedad F\u00edsica": 4, "Abuso de Sustancias / Alcohol": 2, "Laborales": 1, "Otras / Sin Informaci\u00f3n": 25}}, {"ciudad": "Pasto", "lat": 1.2136, "lng": -77.2811, "tgp": 69.45, "to": 62.68, "td": 9.74, "tsub": 10.4, "pct_empleado_particular": 42.55, "pct_cuenta_propia": 41.97, "pct_precarizacion": 46.76, "pct_comercio_alojamiento": 30.58, "cluster": 2, "pc1": -0.88, "pc2": 1.05, "suicidios_totales": 72, "suicidios_con_razon": 48, "suicidios_eco_lab": 7, "pct_eco_conocido": 14.6, "riesgo_psicosocial": "Alto (Incidencia Econ\u00f3mica 14%-20%)", "causas": {"Enfermedad Mental": 18, "Conflicto de Pareja / Sentimental": 12, "Econ\u00f3micas": 6, "Enfermedad F\u00edsica": 5, "Abuso de Sustancias / Alcohol": 4, "Laborales": 1, "Otras / Sin Informaci\u00f3n": 26}}, {"ciudad": "Pereira A.M.", "lat": 4.8133, "lng": -75.6961, "tgp": 59.75, "to": 55.27, "td": 7.48, "tsub": 7.9, "pct_empleado_particular": 58.24, "pct_cuenta_propia": 30.37, "pct_precarizacion": 35.02, "pct_comercio_alojamiento": 28.01, "cluster": 0, "pc1": 1.45, "pc2": -1.1, "suicidios_totales": 44, "suicidios_con_razon": 34, "suicidios_eco_lab": 3, "pct_eco_conocido": 8.8, "riesgo_psicosocial": "Moderado (Incidencia Econ\u00f3mica 8%-14%)", "causas": {"Enfermedad Mental": 15, "Conflicto de Pareja / Sentimental": 8, "Enfermedad F\u00edsica": 4, "Econ\u00f3micas": 3, "Abuso de Sustancias / Alcohol": 2, "Laborales": 0, "Otras / Sin Informaci\u00f3n": 12}}, {"ciudad": "C\u00facuta A.M.", "lat": 7.8939, "lng": -72.5078, "tgp": 61.91, "to": 55.94, "td": 9.64, "tsub": 11.2, "pct_empleado_particular": 32.01, "pct_cuenta_propia": 59.09, "pct_precarizacion": 62.81, "pct_comercio_alojamiento": 33.36, "cluster": 1, "pc1": -2.85, "pc2": -0.25, "suicidios_totales": 47, "suicidios_con_razon": 9, "suicidios_eco_lab": 2, "pct_eco_conocido": 22.2, "riesgo_psicosocial": "Cr\u00edtico (Incidencia Econ\u00f3mica >20%)", "causas": {"Enfermedad Mental": 3, "Conflicto de Pareja / Sentimental": 2, "Econ\u00f3micas": 2, "Enfermedad F\u00edsica": 1, "Abuso de Sustancias / Alcohol": 1, "Laborales": 0, "Otras / Sin Informaci\u00f3n": 38}}, {"ciudad": "Ibagu\u00e9", "lat": 4.4389, "lng": -75.2322, "tgp": 56.63, "to": 49.41, "td": 12.75, "tsub": 12.1, "pct_empleado_particular": 59.56, "pct_cuenta_propia": 30.14, "pct_precarizacion": 33.61, "pct_comercio_alojamiento": 29.73, "cluster": 0, "pc1": 1.15, "pc2": -2.1, "suicidios_totales": 72, "suicidios_con_razon": 27, "suicidios_eco_lab": 0, "pct_eco_conocido": 0.0, "riesgo_psicosocial": "Bajo / Sin Registros Directos (<8%)", "causas": {"Enfermedad Mental": 12, "Conflicto de Pareja / Sentimental": 8, "Enfermedad F\u00edsica": 4, "Abuso de Sustancias / Alcohol": 3, "Econ\u00f3micas": 0, "Laborales": 0, "Otras / Sin Informaci\u00f3n": 45}}, {"ciudad": "Monter\u00eda", "lat": 8.7479, "lng": -75.8814, "tgp": 63.79, "to": 56.63, "td": 11.22, "tsub": 11.8, "pct_empleado_particular": 46.15, "pct_cuenta_propia": 38.61, "pct_precarizacion": 45.79, "pct_comercio_alojamiento": 30.1, "cluster": 2, "pc1": -0.75, "pc2": -0.1, "suicidios_totales": 29, "suicidios_con_razon": 6, "suicidios_eco_lab": 0, "pct_eco_conocido": 0.0, "riesgo_psicosocial": "Bajo / Sin Registros Directos (<8%)", "causas": {"Enfermedad Mental": 3, "Conflicto de Pareja / Sentimental": 2, "Enfermedad F\u00edsica": 1, "Econ\u00f3micas": 0, "Laborales": 0, "Otras / Sin Informaci\u00f3n": 23}}, {"ciudad": "Cartagena", "lat": 10.3997, "lng": -75.5144, "tgp": 63.32, "to": 54.72, "td": 13.59, "tsub": 12.9, "pct_empleado_particular": 36.47, "pct_cuenta_propia": 52.85, "pct_precarizacion": 58.51, "pct_comercio_alojamiento": 29.06, "cluster": 1, "pc1": -2.15, "pc2": -0.85, "suicidios_totales": 66, "suicidios_con_razon": 43, "suicidios_eco_lab": 9, "pct_eco_conocido": 20.9, "riesgo_psicosocial": "Cr\u00edtico (Incidencia Econ\u00f3mica >20%)", "causas": {"Enfermedad Mental": 16, "Conflicto de Pareja / Sentimental": 11, "Econ\u00f3micas": 8, "Enfermedad F\u00edsica": 4, "Abuso de Sustancias / Alcohol": 3, "Laborales": 1, "Otras / Sin Informaci\u00f3n": 23}}, {"ciudad": "Villavicencio", "lat": 4.142, "lng": -73.6266, "tgp": 69.04, "to": 63.48, "td": 8.06, "tsub": 8.6, "pct_empleado_particular": 48.47, "pct_cuenta_propia": 37.35, "pct_precarizacion": 42.66, "pct_comercio_alojamiento": 34.15, "cluster": 2, "pc1": -0.35, "pc2": 1.25, "suicidios_totales": 52, "suicidios_con_razon": 26, "suicidios_eco_lab": 4, "pct_eco_conocido": 15.4, "riesgo_psicosocial": "Alto (Incidencia Econ\u00f3mica 14%-20%)", "causas": {"Enfermedad Mental": 11, "Conflicto de Pareja / Sentimental": 7, "Econ\u00f3micas": 4, "Enfermedad F\u00edsica": 3, "Abuso de Sustancias / Alcohol": 1, "Laborales": 0, "Otras / Sin Informaci\u00f3n": 26}}, {"ciudad": "Tunja", "lat": 5.5353, "lng": -73.3678, "tgp": 60.9, "to": 53.33, "td": 12.43, "tsub": 11.5, "pct_empleado_particular": 53.18, "pct_cuenta_propia": 29.39, "pct_precarizacion": 32.05, "pct_comercio_alojamiento": 23.84, "cluster": 0, "pc1": 1.2, "pc2": -1.35, "suicidios_totales": 19, "suicidios_con_razon": 10, "suicidios_eco_lab": 1, "pct_eco_conocido": 10.0, "riesgo_psicosocial": "Moderado (Incidencia Econ\u00f3mica 8%-14%)", "causas": {"Enfermedad Mental": 5, "Conflicto de Pareja / Sentimental": 3, "Econ\u00f3micas": 1, "Enfermedad F\u00edsica": 1, "Laborales": 0, "Otras / Sin Informaci\u00f3n": 9}}, {"ciudad": "Florencia", "lat": 1.6144, "lng": -75.6062, "tgp": 59.31, "to": 54.53, "td": 8.06, "tsub": 9.1, "pct_empleado_particular": 38.17, "pct_cuenta_propia": 46.89, "pct_precarizacion": 50.94, "pct_comercio_alojamiento": 29.06, "cluster": 1, "pc1": -1.45, "pc2": -0.95, "suicidios_totales": 25, "suicidios_con_razon": 20, "suicidios_eco_lab": 5, "pct_eco_conocido": 25.0, "riesgo_psicosocial": "Cr\u00edtico (Incidencia Econ\u00f3mica >20%)", "causas": {"Enfermedad Mental": 8, "Conflicto de Pareja / Sentimental": 5, "Econ\u00f3micas": 5, "Enfermedad F\u00edsica": 1, "Abuso de Sustancias / Alcohol": 1, "Laborales": 0, "Otras / Sin Informaci\u00f3n": 5}}, {"ciudad": "Popay\u00e1n", "lat": 2.4448, "lng": -76.6147, "tgp": 62.73, "to": 57.59, "td": 8.2, "tsub": 9.4, "pct_empleado_particular": 40.11, "pct_cuenta_propia": 43.63, "pct_precarizacion": 48.65, "pct_comercio_alojamiento": 28.61, "cluster": 2, "pc1": -1.1, "pc2": -0.15, "suicidios_totales": 43, "suicidios_con_razon": 17, "suicidios_eco_lab": 2, "pct_eco_conocido": 11.8, "riesgo_psicosocial": "Moderado (Incidencia Econ\u00f3mica 8%-14%)", "causas": {"Enfermedad Mental": 7, "Conflicto de Pareja / Sentimental": 5, "Econ\u00f3micas": 2, "Enfermedad F\u00edsica": 2, "Abuso de Sustancias / Alcohol": 1, "Laborales": 0, "Otras / Sin Informaci\u00f3n": 26}}, {"ciudad": "Valledupar", "lat": 10.4631, "lng": -73.2532, "tgp": 58.99, "to": 53.24, "td": 9.75, "tsub": 10.2, "pct_empleado_particular": 50.79, "pct_cuenta_propia": 36.05, "pct_precarizacion": 42.68, "pct_comercio_alojamiento": 30.32, "cluster": 2, "pc1": -0.4, "pc2": -1.2, "suicidios_totales": 31, "suicidios_con_razon": 6, "suicidios_eco_lab": 1, "pct_eco_conocido": 16.7, "riesgo_psicosocial": "Alto (Incidencia Econ\u00f3mica 14%-20%)", "causas": {"Enfermedad Mental": 3, "Conflicto de Pareja / Sentimental": 1, "Econ\u00f3micas": 1, "Enfermedad F\u00edsica": 1, "Laborales": 0, "Otras / Sin Informaci\u00f3n": 25}}, {"ciudad": "Quibd\u00f3", "lat": 5.6947, "lng": -76.6611, "tgp": 56.74, "to": 43.71, "td": 22.96, "tsub": 18.5, "pct_empleado_particular": 35.31, "pct_cuenta_propia": 46.48, "pct_precarizacion": 52.12, "pct_comercio_alojamiento": 25.66, "cluster": 1, "pc1": -2.95, "pc2": -2.8, "suicidios_totales": 5, "suicidios_con_razon": 1, "suicidios_eco_lab": 0, "pct_eco_conocido": 0.0, "riesgo_psicosocial": "Bajo / Sin Registros Directos (<8%)", "causas": {"Conflicto de Pareja / Sentimental": 1, "Enfermedad Mental": 0, "Econ\u00f3micas": 0, "Laborales": 0, "Otras / Sin Informaci\u00f3n": 4}}, {"ciudad": "Neiva", "lat": 2.9273, "lng": -75.2819, "tgp": 63.66, "to": 57.44, "td": 9.77, "tsub": 10.1, "pct_empleado_particular": 48.78, "pct_cuenta_propia": 41.37, "pct_precarizacion": 43.85, "pct_comercio_alojamiento": 30.24, "cluster": 2, "pc1": -0.55, "pc2": 0.05, "suicidios_totales": 29, "suicidios_con_razon": 12, "suicidios_eco_lab": 0, "pct_eco_conocido": 0.0, "riesgo_psicosocial": "Bajo / Sin Registros Directos (<8%)", "causas": {"Enfermedad Mental": 6, "Conflicto de Pareja / Sentimental": 4, "Enfermedad F\u00edsica": 2, "Econ\u00f3micas": 0, "Laborales": 0, "Otras / Sin Informaci\u00f3n": 17}}, {"ciudad": "Riohacha", "lat": 11.5444, "lng": -72.9072, "tgp": 63.15, "to": 55.7, "td": 11.8, "tsub": 13.1, "pct_empleado_particular": 27.5, "pct_cuenta_propia": 56.13, "pct_precarizacion": 62.52, "pct_comercio_alojamiento": 25.89, "cluster": 1, "pc1": -2.75, "pc2": -0.65, "suicidios_totales": 16, "suicidios_con_razon": 6, "suicidios_eco_lab": 1, "pct_eco_conocido": 16.7, "riesgo_psicosocial": "Alto (Incidencia Econ\u00f3mica 14%-20%)", "causas": {"Enfermedad Mental": 3, "Conflicto de Pareja / Sentimental": 2, "Econ\u00f3micas": 1, "Enfermedad F\u00edsica": 0, "Laborales": 0, "Otras / Sin Informaci\u00f3n": 10}}, {"ciudad": "Santa Marta", "lat": 11.2408, "lng": -74.199, "tgp": 57.37, "to": 52.28, "td": 8.87, "tsub": 9.2, "pct_empleado_particular": 48.96, "pct_cuenta_propia": 40.84, "pct_precarizacion": 45.0, "pct_comercio_alojamiento": 32.25, "cluster": 2, "pc1": -0.68, "pc2": -1.35, "suicidios_totales": 37, "suicidios_con_razon": 12, "suicidios_eco_lab": 1, "pct_eco_conocido": 8.3, "riesgo_psicosocial": "Moderado (Incidencia Econ\u00f3mica 8%-14%)", "causas": {"Enfermedad Mental": 3, "Conflicto de Pareja / Sentimental": 5, "Enfermedad F\u00edsica": 2, "Econ\u00f3micas": 1, "Abuso de Sustancias / Alcohol": 1, "Laborales": 0, "Otras / Sin Informaci\u00f3n": 25}}, {"ciudad": "Armenia", "lat": 4.5339, "lng": -75.6811, "tgp": 60.97, "to": 55.78, "td": 8.51, "tsub": 9.0, "pct_empleado_particular": 48.42, "pct_cuenta_propia": 38.62, "pct_precarizacion": 43.32, "pct_comercio_alojamiento": 29.67, "cluster": 2, "pc1": -0.42, "pc2": -0.8, "suicidios_totales": 39, "suicidios_con_razon": 10, "suicidios_eco_lab": 2, "pct_eco_conocido": 20.0, "riesgo_psicosocial": "Cr\u00edtico (Incidencia Econ\u00f3mica >20%)", "causas": {"Enfermedad Mental": 4, "Conflicto de Pareja / Sentimental": 3, "Econ\u00f3micas": 2, "Enfermedad F\u00edsica": 1, "Laborales": 0, "Otras / Sin Informaci\u00f3n": 29}}, {"ciudad": "Sincelejo", "lat": 9.3047, "lng": -75.3978, "tgp": 63.49, "to": 55.25, "td": 12.97, "tsub": 13.8, "pct_empleado_particular": 37.61, "pct_cuenta_propia": 47.61, "pct_precarizacion": 54.17, "pct_comercio_alojamiento": 29.23, "cluster": 1, "pc1": -1.85, "pc2": -0.75, "suicidios_totales": 22, "suicidios_con_razon": 17, "suicidios_eco_lab": 4, "pct_eco_conocido": 23.5, "riesgo_psicosocial": "Cr\u00edtico (Incidencia Econ\u00f3mica >20%)", "causas": {"Enfermedad Mental": 7, "Conflicto de Pareja / Sentimental": 5, "Econ\u00f3micas": 4, "Enfermedad F\u00edsica": 1, "Laborales": 0, "Otras / Sin Informaci\u00f3n": 5}}];
 
         const clusterDescriptions = {
             0: {
                 name: "Cluster 0: Formales / Consolidados",
                 badgeClass: "badge-cluster-0",
+                colorHex: "#10b981",
                 desc: "Ciudades con alta proporción de empleo asalariado formal en empresas privadas (~58.4%) y menor precarización relativa (~32.8%). Mayores niveles de cobertura en seguridad social.",
                 policy: "Promoción de programas de bienestar laboral y salud mental corporativa, apoyo a la reconversión tecnológica y redes de contención para personas desempleadas del sector calificado.",
                 mentalNote: "Menor prevalencia de desempleo de subsistencia extrema, pero con focos de estrés relacionados con fricciones en la búsqueda de primer empleo o dinámicas laborales competitivas."
@@ -389,6 +452,7 @@
             1: {
                 name: "Cluster 1: Precarización Extrema",
                 badgeClass: "badge-cluster-1",
+                colorHex: "#ef4444",
                 desc: "Mercados laborales con elevadas tasas de desocupación (~12.8%) y una altísima dominancia del trabajo por cuenta propia e informalidad (>55%). Fuerte fragilidad económica.",
                 policy: "Planes de choque de empleo juvenil, flexibilización del crédito productivo formal para sacar a los hogares del 'gota a gota', e intervención prioritaria de salud mental en zonas vulnerables.",
                 mentalNote: "Riesgo psicosocial elevado debido a la combinación de desempleo prolongado, alta vulnerabilidad financiera y sobreendeudamiento en la economía informal."
@@ -396,12 +460,15 @@
             2: {
                 name: "Cluster 2: Informalidad Urbana (Transición / Foco Regional)",
                 badgeClass: "badge-cluster-2",
+                colorHex: "#f59e0b",
                 desc: "Paradoja Ocupacional: Alta participación laboral movida por la necesidad de generar ingresos diarios, pero con niveles de precarización cercanos al 45% y alta concentración en comercio y servicios.",
                 policy: "Estrategias intersectoriales entre Desarrollo Económico y Salud Pública: Microcréditos productivos acompañados de talleres de manejo del estrés financiero y acompañamiento psicosocial comunitario.",
                 mentalNote: "Burnout de Subsistencia: Extenuantes jornadas informales sin red de seguridad social, donde la imposibilidad de parar de trabajar genera desatención severa de la salud mental."
             }
         };
 
+        let mapInstance = null;
+        let mapMarkers = {};
         let pcaChartInstance = null;
         let compChartInstance = null;
         let pieChartInstance = null;
@@ -410,6 +477,7 @@
             if (window.lucide) lucide.createIcons();
             populateSelect();
             renderTable();
+            initColombiaMap();
             initPcaChart();
             updateDashboard("Pasto");
         });
@@ -427,12 +495,68 @@
             select.addEventListener('change', (e) => updateDashboard(e.target.value));
         }
 
+        function initColombiaMap() {
+            mapInstance = L.map('map', {
+                center: [4.5709, -74.2973],
+                zoom: 5,
+                zoomControl: true
+            });
+
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+                attribution: '&copy; OpenStreetMap &copy; CARTO',
+                subdomains: 'abcd',
+                maxZoom: 18
+            }).addTo(mapInstance);
+
+            cityData.forEach(city => {
+                const color = clusterDescriptions[city.cluster].colorHex;
+                const marker = L.circleMarker([city.lat, city.lng], {
+                    radius: 7,
+                    fillColor: color,
+                    color: '#ffffff',
+                    weight: 1.5,
+                    opacity: 1,
+                    fillOpacity: 0.85
+                }).addTo(mapInstance);
+
+                marker.bindTooltip(`<strong>${city.ciudad}</strong><br>Cluster ${city.cluster}`, { direction: 'top' });
+
+                marker.on('click', () => {
+                    document.getElementById('city-select').value = city.ciudad;
+                    updateDashboard(city.ciudad);
+                });
+
+                mapMarkers[city.ciudad] = marker;
+            });
+        }
+
         function updateDashboard(cityName) {
             const city = cityData.find(c => c.ciudad === cityName);
             if (!city) return;
             const cluster = clusterDescriptions[city.cluster];
 
-            // 1. Actualizar KPIs Laborales
+            // 1. Actualizar Bloque Superior de Cluster
+            document.getElementById('top-cluster-info').innerHTML = `
+                <div class="flex flex-wrap items-center justify-between gap-2">
+                    <h3 class="text-xl font-bold text-white flex items-center gap-2">
+                        <i data-lucide="map-pin" class="w-5 h-5 text-indigo-400"></i> ${city.ciudad}
+                    </h3>
+                    <span class="badge-tag ${cluster.badgeClass}">${cluster.name}</span>
+                </div>
+                <p class="text-xs text-slate-300 leading-relaxed">${cluster.desc}</p>
+                <div class="p-3 bg-slate-900/90 rounded-lg border border-slate-700/80 text-xs space-y-1">
+                    <div class="flex justify-between">
+                        <span class="text-slate-400">Clasificación Territorial:</span>
+                        <strong class="text-indigo-300">Cluster ${city.cluster}</strong>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-slate-400">Nivel de Precarización:</span>
+                        <strong class="text-amber-400">${city.pct_precarizacion}%</strong>
+                    </div>
+                </div>
+            `;
+
+            // 2. Actualizar KPIs Laborales
             document.getElementById('kpi-laboral-banner').innerHTML = `
                 <div class="bg-slate-800/90 border border-slate-700 p-4 rounded-xl">
                     <p class="text-xs text-slate-400 font-semibold uppercase tracking-wider">Tasa de Desocupación (TD)</p>
@@ -456,55 +580,52 @@
                 </div>
             `;
 
-            // 2. Actualizar Tarjeta de Contexto Laboral y Cluster
-            document.getElementById('city-cluster-card').innerHTML = `
+            // 3. Actualizar Tarjeta Contexto Laboral y Paradoja Ocupacional
+            document.getElementById('city-labor-context-card').innerHTML = `
                 <div>
-                    <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
-                        <h3 class="text-xl font-bold text-white flex items-center gap-2">
-                            <i data-lucide="map-pin" class="w-5 h-5 text-indigo-400"></i> ${city.ciudad}
-                        </h3>
-                        <span class="badge-tag ${cluster.badgeClass}">${cluster.name}</span>
-                    </div>
-                    <p class="text-xs text-slate-300 leading-relaxed mb-3">${cluster.desc}</p>
+                    <h4 class="text-sm font-bold text-white flex items-center gap-2 mb-2">
+                        <i data-lucide="building-2" class="w-4 h-4 text-indigo-400"></i> Contexto Laboral & Paradoja Ocupacional en ${city.ciudad}
+                    </h4>
+                    <p class="text-xs text-slate-300 leading-relaxed mb-3">
+                        En <strong>${city.ciudad}</strong>, la Tasa Ocupacional se ubica en el <strong>${city.to}%</strong>. Sin embargo, el <strong>${city.pct_precarizacion}%</strong> de los trabajadores laboran en condiciones de precarización o informalidad por cuenta propia, mientras que solo el <strong>${city.pct_empleado_particular}%</strong> cuenta con contrato asalariado formal en empresas.
+                    </p>
                 </div>
 
-                <div class="space-y-2 bg-slate-900/80 p-3.5 rounded-lg border border-slate-700/70 text-xs">
-                    <h4 class="font-bold text-indigo-300 uppercase tracking-wider text-[11px]">Estructura de la Fuerza Laboral en ${city.ciudad}:</h4>
-                    <div class="grid grid-cols-2 gap-2 text-slate-200">
-                        <div>• <strong>Ocupación (TO):</strong> ${city.to}%</div>
-                        <div>• <strong>Asalariado Formal:</strong> ${city.pct_empleado_particular}%</div>
-                        <div>• <strong>Cuenta Propia:</strong> ${city.pct_cuenta_propia}%</div>
-                        <div>• <strong>Comercio/Servicios:</strong> ${city.pct_comercio_alojamiento}%</div>
-                    </div>
+                <div class="space-y-1.5 bg-slate-900/80 p-3 rounded-lg border border-slate-700/70 text-xs">
+                    <div class="flex justify-between"><span>• Tasa de Ocupación (TO):</span> <strong>${city.to}%</strong></div>
+                    <div class="flex justify-between"><span>• Asalariados Formales:</span> <strong>${city.pct_empleado_particular}%</strong></div>
+                    <div class="flex justify-between"><span>• Trabajadores Cuenta Propia:</span> <strong>${city.pct_cuenta_propia}%</strong></div>
+                    <div class="flex justify-between"><span>• Sector Comercio y Servicios:</span> <strong>${city.pct_comercio_alojamiento}%</strong></div>
                 </div>
             `;
 
-            // 3. Actualizar Análisis Psicosocial de la Ciudad Selected
+            // 4. Actualizar Recomendaciones de Política Pública para ____ (REUBICADO EN SECCIÓN LABORAL)
+            document.getElementById('policy-recommendations-card').innerHTML = `
+                <h4 class="text-xs font-bold text-indigo-300 uppercase tracking-wider flex items-center gap-1.5">
+                    <i data-lucide="lightbulb" class="w-4 h-4 text-indigo-400"></i> Recomendaciones de Política Pública para ${city.ciudad}
+                </h4>
+                <p class="text-xs text-slate-200 leading-relaxed">${cluster.policy}</p>
+                <div class="text-[11px] bg-indigo-950/50 p-2.5 rounded border border-indigo-800/50 text-indigo-200 mt-1">
+                    <strong>Acción Territorial Prioritaria:</strong> Articular el plan de desarrollo económico municipal con las Secretarías de Salud para brindar apoyo de gestión del estrés financiero y formalización de microempresas.
+                </div>
+            `;
+
+            // 5. Actualizar Análisis de Salud Mental
             document.getElementById('mental-health-analysis-card').innerHTML = `
                 <div class="flex items-center justify-between">
                     <h4 class="text-xs font-bold text-rose-300 uppercase tracking-wider flex items-center gap-1.5">
-                        <i data-lucide="heart-pulse" class="w-4 h-4 text-rose-400"></i> Evaluación de Salud Mental en ${city.ciudad}
+                        <i data-lucide="heart-pulse" class="w-4 h-4 text-rose-400"></i> Diagnóstico de Salud Mental en ${city.ciudad}
                     </h4>
                     <span class="text-xs font-bold text-rose-300 bg-rose-500/10 px-2.5 py-1 rounded border border-rose-500/20">${city.riesgo_psicosocial}</span>
                 </div>
                 
                 <p class="text-xs text-slate-200 leading-relaxed">
-                    Según los registros del Instituto Nacional de Medicina Legal (2025–2026), en <strong>${city.ciudad}</strong> se presentaron <strong>${city.suicidios_totales} lesiones fatales por suicidio</strong> (${city.suicidios_con_razon} con causa identificada en el expediente). De estos casos, <strong>${city.suicidios_eco_lab} respondieron directamente a razones económicas o laborales</strong>, lo que equivale al <strong>${city.pct_eco_conocido}%</strong> de las causas conocidas.
+                    De acuerdo con los microdatos de Medicina Legal (2025–2026), en <strong>${city.ciudad}</strong> se registraron <strong>${city.suicidios_totales} suicidios</strong> (${city.suicidios_con_razon} con causa identificada). Un total de <strong>${city.suicidios_eco_lab} casos (${city.pct_eco_conocido}%)</strong> respondieron directamente a razones económicas o laborales.
                 </p>
 
-                <div class="text-xs bg-rose-950/40 p-3 rounded-lg border border-rose-800/50 text-rose-200">
-                    <strong>Patrón de Vulnerabilidad Psicosocial:</strong> ${cluster.mentalNote}
-                </div>
-            `;
-
-            // 4. Actualizar Tarjeta de Recomendaciones por Ciudad
-            document.getElementById('policy-recommendations-card').innerHTML = `
-                <h4 class="text-xs font-bold text-indigo-300 uppercase tracking-wider flex items-center gap-1.5">
-                    <i data-lucide="lightbulb" class="w-4 h-4 text-indigo-400"></i> Recomendaciones de Política Pública para ${city.ciudad}
-                </h4>
-                <p class="text-xs text-slate-300 leading-relaxed">${cluster.policy}</p>
-                <div class="text-[11px] bg-indigo-950/40 p-2.5 rounded border border-indigo-800/40 text-indigo-200 mt-1">
-                    <strong>Acción prioritaria:</strong> Articular la oferta de fomento empresarial de la Alcaldía de ${city.ciudad} con las redes locales de salud mental y líneas de atención en crisis para microempresarios e independientes.
+                <div class="text-xs bg-rose-950/40 p-3 rounded-lg border border-rose-800/50 text-rose-200 space-y-1">
+                    <p><strong>Perfil de Vulnerabilidad Psicosocial:</strong> ${cluster.mentalNote}</p>
+                    <p class="pt-1 text-[11px] text-rose-300 border-t border-rose-800/40">• Se observa mayor fragilidad en trabajadores independientes informales por sobreendeudamiento diario y falta de liquidez.</p>
                 </div>
             `;
 
@@ -513,6 +634,14 @@
             updateCompChart(city);
             updatePieSuicideChart(city);
             highlightTableRow(city.ciudad);
+
+            // Centrar mapa en la ciudad seleccionada
+            if (mapInstance && city.lat && city.lng) {
+                mapInstance.setView([city.lat, city.lng], 9, { animate: true });
+                if (mapMarkers[city.ciudad]) {
+                    mapMarkers[city.ciudad].openTooltip();
+                }
+            }
         }
 
         function updateCompChart(city) {
@@ -566,20 +695,30 @@
             const ctxPie = document.getElementById('pieSuicideChart').getContext('2d');
             document.getElementById('pie-city-title').textContent = city.ciudad;
 
-            const ecoCasos = city.suicidios_eco_lab;
-            const totalConocido = city.suicidios_con_razon;
-            const otrosCasos = Math.max(0, totalConocido - ecoCasos);
-            const sinInfo = Math.max(0, city.suicidios_totales - totalConocido);
+            // Extraer las causas específicas requeridas
+            const causas = city.causas || {};
+            const labels = [
+                'Enfermedad Mental',
+                'Conflicto de Pareja / Sentimental',
+                'Económicas',
+                'Abuso de Sustancias / Alcohol',
+                'Enfermedad Física',
+                'Laborales',
+                'Otras / Sin Información'
+            ];
+
+            const dataValues = labels.map(l => causas[l] || 0);
+            const colors = ['#38bdf8', '#fb7185', '#f59e0b', '#f43f5e', '#a78bfa', '#6366f1', '#475569'];
 
             if (pieChartInstance) pieChartInstance.destroy();
 
             pieChartInstance = new Chart(ctxPie, {
                 type: 'doughnut',
                 data: {
-                    labels: ['Razones Económicas/Laborales', 'Otras Causas Conocidas', 'Sin Información'],
+                    labels: labels,
                     datasets: [{
-                        data: [ecoCasos, otrosCasos, sinInfo],
-                        backgroundColor: ['#f43f5e', '#38bdf8', '#475569'],
+                        data: dataValues,
+                        backgroundColor: colors,
                         borderWidth: 2,
                         borderColor: '#1e293b'
                     }]
@@ -591,7 +730,7 @@
                         legend: {
                             display: true,
                             position: 'bottom',
-                            labels: { color: '#cbd5e1', font: { size: 10 }, boxWidth: 10, padding: 8 }
+                            labels: { color: '#cbd5e1', font: { size: 10 }, boxWidth: 10, padding: 6 }
                         },
                         tooltip: {
                             callbacks: {
@@ -602,8 +741,9 @@
                 }
             });
 
+            const ecoLabTotal = (causas['Económicas'] || 0) + (causas['Laborales'] || 0);
             document.getElementById('pie-summary-text').innerHTML = `
-                En <strong>${city.ciudad}</strong>, el <strong>${city.pct_eco_conocido}%</strong> de los casos con motivo documentado (${ecoCasos} de ${totalConocido}) responden a factores económicos o laborales.
+                En <strong>${city.ciudad}</strong>, los desencadenantes de origen <strong>económico o laboral sumaron ${ecoLabTotal} casos</strong> de un total de ${city.suicidios_totales} registrados.
             `;
         }
 
