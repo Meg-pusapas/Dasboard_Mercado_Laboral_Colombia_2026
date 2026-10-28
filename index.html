@@ -399,6 +399,36 @@
 
             </div>
 
+            <!-- Nuevo Módulo: Rendimiento del Modelo Predictivo (Random Forest SISMEL) -->
+            <div class="card-panel border-emerald-500/30 bg-slate-800/90 mt-6">
+                <div class="flex items-center gap-2 mb-4">
+                    <span class="p-1.5 bg-emerald-500/20 text-emerald-400 rounded-md border border-emerald-500/30">
+                        <i data-lucide="cpu" class="w-5 h-5"></i>
+                    </span>
+                    <div>
+                        <h3 class="text-base font-bold text-emerald-300">Rendimiento del Clasificador SISMEL (Random Forest)</h3>
+                        <p class="text-xs text-slate-400">Evaluación del modelo de Machine Learning con validación temporal (sin fuga de datos)</p>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="bg-slate-900/80 p-4 rounded-lg border border-slate-700/50 text-center">
+                        <p class="text-xs text-slate-400 uppercase tracking-wider font-semibold">AUC (Etapa 1: 2022-2024)</p>
+                        <p class="text-2xl font-bold text-emerald-400 mt-1">0.699</p>
+                        <p class="text-[11px] text-slate-500 mt-1">Supera la línea base en validación</p>
+                    </div>
+                    <div class="bg-slate-900/80 p-4 rounded-lg border border-slate-700/50 text-center">
+                        <p class="text-xs text-slate-400 uppercase tracking-wider font-semibold">AUC (Etapa 2: 2025-2026)</p>
+                        <p class="text-2xl font-bold text-emerald-400 mt-1">0.697</p>
+                        <p class="text-[11px] text-slate-500 mt-1">Generalización estable en datos nuevos</p>
+                    </div>
+                    <div class="bg-slate-900/80 p-4 rounded-lg border border-slate-700/50 text-center">
+                        <p class="text-xs text-slate-400 uppercase tracking-wider font-semibold">Determinante (V de Cramér)</p>
+                        <p class="text-lg font-bold text-rose-300 mt-1">Edad y Ciclo Vital</p>
+                        <p class="text-[11px] text-slate-400 mt-1">Hombres entre 29 y 59 años</p>
+                    </div>
+                </div>
+            </div>
+
         </section>
 
 
@@ -435,6 +465,16 @@
                 </table>
             </div>
         </section>
+
+        <!-- Disclaimer Ético y Metodológico -->
+        <div class="mt-8 p-4 bg-slate-800/80 border-l-4 border-indigo-500 rounded-r-lg shadow-lg">
+            <h4 class="text-sm font-bold text-indigo-300 flex items-center gap-2">
+                <i data-lucide="info" class="w-5 h-5"></i> Nota Ética y Metodológica (CRISP-DM)
+            </h4>
+            <p class="text-xs text-slate-300 mt-2 leading-relaxed">
+                Los resultados expuestos en este observatorio son <strong>estrictamente asociativos, no causales</strong>. El modelo de clasificación (Random Forest) y la clusterización describen perfiles de riesgo en datos agregados del INMLCF y la GEIH. No evalúan el riesgo clínico de una persona individual, ni asignan causas deterministas a casos específicos.
+            </p>
+        </div>
 
     </main>
 
